@@ -1,8 +1,8 @@
 import { useState } from 'react'
-
 import { PlusCircle, Trash2 } from 'lucide-react'
-import React from 'react'
 import { Label } from '@radix-ui/react-label'
+import React from 'react'
+import './index.css'
 
 type CreditCard = {
   company: string
@@ -15,13 +15,23 @@ type SpendingCategory = {
   cashback: number
 }
 
-export default function Component() {
-  const [cards, setCards] = useState<CreditCard[]>([{ company: '', type: '' }])
-  const [showResults, setShowResults] = useState(false)
+const cardCompanies = ['Chase', 'Amex', 'Capital One', 'Citi']
 
-  const addCard = () => {
+const cardOptions = {
+  Chase: ['Sapphire Preferred', 'Freedom Flex', 'Freedom Unlimited'],
+  Amex: ['Gold', 'Platinum', 'Green'],
+  'Capital One': ['Venture', 'Quicksilver', 'Savor'],
+  Citi: ['Premier', 'Double Cash', 'Custom Cash']
+}
+
+export default function Component() {
+  const [cards, setCards] = useState<CreditCard[]>([])
+  const [showResults, setShowResults] = useState(false)
+  const [selectedCompany, setSelectedCompany] = useState('')
+
+  const addCard = (type: string) => {
     if (cards.length < 6) {
-      setCards([...cards, { company: '', type: '' }])
+      setCards([...cards, { company: selectedCompany, type }])
     }
   }
 
@@ -30,17 +40,19 @@ export default function Component() {
     setCards(newCards)
   }
 
-  const updateCard = (index: number, field: 'company' | 'type', value: string) => {
-    const newCards = [...cards]
-    newCards[index][field] = value
-    setCards(newCards)
-  }
+  const [results, setResults] = useState<SpendingCategory[]>([]);
 
-  const generateResults = () => {
-    // This is where you'd implement the logic to determine the best card for each category
-    // For now, we'll use dummy data
-    setShowResults(true)
-  }
+  const generateResults = async () => {
+    try {
+      const response = await fetch(`http://localhost:5001/api/cards/filter?company=${selectedCompany}&type=Gold`);
+      const data = await response.json();
+      setResults(data);
+      setShowResults(true);
+      // Process the data as needed and update your state
+    } catch (error) {
+      console.error('Error fetching results:', error);
+    }
+  };
 
   const dummyResults: SpendingCategory[] = [
     { name: 'Groceries', bestCard: 'Chase Sapphire Preferred', cashback: 3 },
@@ -50,68 +62,82 @@ export default function Component() {
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-400 via-pink-500 to-red-500 p-8">
-      <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden">
+    <div className="min-h-screen bg-pink-100 p-8">
+      <div className="max-w-4xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden">
         <div className="p-8">
-          <h1 className="text-4xl font-bold mb-6 text-center text-gray-800">Credit Card Advisor</h1>
-          <div className="space-y-6">
-            {cards.map((card, index) => (
-              <div key={index} className="flex items-center space-x-4">
-                <div className="flex-grow">
-                  <Label htmlFor={`company-${index}`} className="text-sm font-medium text-gray-700">
-                    Card Company
-                  </Label>
-                  <input
-                    id={`company-${index}`}
-                    value={card.company}
-                    onChange={(e) => updateCard(index, 'company', e.target.value)}
-                    className="mt-1"
-                    placeholder="e.g. Chase, Amex"
-                  />
+          <h1 className="text-5xl font-bold mb-8 text-center text-pink-600 animate-pulse">WHAT CARD WHEN?</h1>
+          <div className="space-y-8">
+            <div>
+              <Label htmlFor="company-select" className="text-lg font-medium text-green-700">
+                Select Card Company
+              </Label>
+              <div className="space-y-8">
+              <select
+                id="company-select"
+                value={selectedCompany}
+                onChange={(e) => setSelectedCompany(e.target.value)}
+                className="mt-2 block w-full p-3 border-2 border-pink-300 rounded-xl focus:border-green-500 focus:ring focus:ring-green-200 transition duration-200"
+              >
+                <option value="">Select a company</option>
+                {cardCompanies.map((company) => (
+                  <option key={company} value={company}>
+                    {company}
+                  </option>
+                ))}
+              </select>
+            </div>
+            </div>
+            {selectedCompany && (
+              <div>
+                <h2 className="text-2xl font-semibold mb-4 text-green-600">Select Cards:</h2>
+                <div className="flex flex-wrap gap-3">
+                  {cardOptions[selectedCompany as keyof typeof cardOptions].map((card: string) => (
+                    <button
+                      key={card}
+                      onClick={() => addCard(card)}
+                      className="px-6 py-3 bg-pink-500 text-white rounded-full hover:bg-pink-600 transform hover:scale-105 transition duration-200 shadow-md"
+                      disabled={cards.length >= 6}
+                    >
+                      {card}
+                    </button>
+                  ))}
                 </div>
-                <div className="flex-grow">
-                  <Label htmlFor={`type-${index}`} className="text-sm font-medium text-gray-700">
-                    Card Type
-                  </Label>
-                  <input
-                    id={`type-${index}`}
-                    value={card.type}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateCard(index, 'type', e.target.value)}
-                    className="mt-1"
-                    placeholder="e.g. Sapphire Preferred, Gold"
-                  />
-                </div>
-                {index > 0 && (
-                  <button
-                    onClick={() => removeCard(index)}
-                    // variant="destructive"
-                    // size="icon"
-                    className="mt-6"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                )}
               </div>
-            ))}
+            )}
+            <div className="mt-6">
+              <h2 className="text-2xl font-semibold mb-4 text-green-600">Selected Cards:</h2>
+              <div className="space-y-3">
+                {cards.map((card, index) => (
+                  <div key={index} className="flex items-center justify-between bg-green-100 p-4 rounded-xl shadow-sm">
+                    <span className="text-lg text-pink-700 font-medium">{`${card.company} - ${card.type}`}</span>
+                    <button
+                      onClick={() => removeCard(index)}
+                      className="text-pink-500 hover:text-pink-700 transform hover:scale-110 transition duration-200"
+                    >
+                      <Trash2 className="h-6 w-6" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
-          {cards.length < 6 && (
-            <button onClick={addCard} className="mt-6 bg-green-500 hover:bg-green-600">
-              <PlusCircle className="mr-2 h-4 w-4" /> Add Card
-            </button>
-          )}
-          <button onClick={generateResults} className="mt-6 w-full bg-blue-500 hover:bg-blue-600">
+          <button 
+            onClick={generateResults} 
+            className="mt-8 w-full bg-green-500 hover:bg-green-600 text-white py-4 rounded-full text-xl font-bold shadow-lg transform hover:scale-105 transition duration-200"
+            disabled={cards.length === 0}
+          >
             Generate Results
           </button>
         </div>
         {showResults && (
-          <div className="bg-gray-100 p-8">
-            <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Best Cards for Each Category</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {dummyResults.map((category, index) => (
-                <div key={index} className="bg-white rounded-lg shadow-md p-6 transform transition duration-500 hover:scale-105">
-                  <h3 className="text-xl font-semibold mb-2 text-gray-800">{category.name}</h3>
-                  <p className="text-lg text-blue-600 font-medium">{category.bestCard}</p>
-                  <p className="text-sm text-gray-600">{category.cashback}% cashback</p>
+          <div className="bg-pink-100 p-8 rounded-t-3xl mt-8">
+            <h2 className="text-3xl font-bold mb-6 text-green-700">Your Optimal Card Usage:</h2>
+            <div className="space-y-4">
+              {results.map((category, index) => (
+                <div key={index} className="bg-white p-4 rounded-xl shadow-md">
+                  <h3 className="text-xl font-semibold text-pink-600 mb-2">{category.name}</h3>
+                  <p className="text-green-700">Best Card: <span className="font-medium">{category.bestCard}</span></p>
+                  <p className="text-green-700">Cashback: <span className="font-medium">{category.cashback}%</span></p>
                 </div>
               ))}
             </div>
