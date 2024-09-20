@@ -88,7 +88,7 @@ useEffect(() => {
 
   return (
 <div className="min-h-screen bg-lightGreen flex items-center justify-center p-8">
-      <div className="max-w-4xl w-full mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden">
+      <div className="max-w-4xl w-full mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden border-4 border-darkGreen">
         <div className="p-8">
         <h1 className="text-5xl font-bold mb-8 text-center gradient-text">
             What Card When?
@@ -98,7 +98,7 @@ useEffect(() => {
               <Label htmlFor="category-select" className="text-lg font-medium text-darkGreen">
                 Select Categories
               </Label>
-              <div className="space-y-4 mt-2 border border-darkGreen rounded-lg p-4 bg-gray-50">
+              <div className="grid grid-cols-2 gap-4 mt-2 border border-darkGreen rounded-lg p-4 bg-gray-50">
                 {categories.map((category) => (
                   <div key={category} className="flex items-center">
                     <input
