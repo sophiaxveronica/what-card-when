@@ -4,8 +4,6 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cardsRouter from './routes/cards';
 
-
-
 dotenv.config();
 
 const app = express();

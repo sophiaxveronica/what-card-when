@@ -27,6 +27,13 @@ const categories = [
   'flights'
 ];
 
+const capitalizeWords = (str: string) => {
+  return str
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+};
+
 export default function Component() {
   const [cards, setCards] = useState<{ company: string; type: string }[]>([]);
   const [selectedCompany, setSelectedCompany] = useState('');
@@ -80,16 +87,18 @@ useEffect(() => {
   };
 
   return (
-    <div className="min-h-screen bg-lightGreen flex items-center justify-center p-8">
-      <div className="max-w-4xl w-full mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden">
+<div className="min-h-screen bg-lightGreen flex items-center justify-center p-8">
+      <div className="max-w-4xl w-full mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden border-4 border-darkGreen">
         <div className="p-8">
-          <h1 className="text-5xl font-bold mb-8 text-center text-neonGreen animate-pulse">WHAT CARD WHEN?</h1>
+        <h1 className="text-5xl font-bold mb-8 text-center gradient-text">
+            What Card When?
+          </h1>
           <div className="space-y-8">
             <div>
               <Label htmlFor="category-select" className="text-lg font-medium text-darkGreen">
                 Select Categories
               </Label>
-              <div className="space-y-4 mt-2 border border-darkGreen rounded-lg p-4 bg-gray-50">
+              <div className="grid grid-cols-2 gap-4 mt-2 border border-darkGreen rounded-lg p-4 bg-gray-50">
                 {categories.map((category) => (
                   <div key={category} className="flex items-center">
                     <input
@@ -106,7 +115,7 @@ useEffect(() => {
                       className="form-checkbox h-5 w-5 text-neonGreen border-gray-300 rounded focus:ring-neonGreen"
                     />
                     <label htmlFor={category} className="ml-2 text-lg text-darkGreen hover:text-neonGreen transition duration-200">
-                      {category}
+                      {capitalizeWords(category)}
                     </label>
                   </div>
                 ))}
@@ -190,12 +199,12 @@ useEffect(() => {
           </button>
         </div>
         {showResults && (
-          <div className="bg-white p-8 rounded-t-3xl mt-8">
+          <div className="bg-white p-8 rounded-t-3xl mt-8 ">
             <h2 className="text-3xl font-bold mb-6 text-darkGreen">Your Optimal Card Usage:</h2>
             <div className="space-y-4">
               {results.map((category, index) => (
-                <div key={index} className="bg-white p-4 rounded-xl shadow-md">
-                  <h3 className="text-xl font-semibold text-neonGreen mb-2">{category.category}</h3>
+                <div key={index} className="bg-white p-4 rounded-xl shadow-md border-2 border-darkGreen">
+                  <h3 className="text-xl font-semibold text-neonGreen mb-2">{capitalizeWords(category.category)}</h3>
                   {category.bestCard ? (
                     <>
                       <p className="text-darkGreen">Best Card: <span className="font-medium">{`${category.bestCard.company} - ${category.bestCard.type}`}</span></p>
