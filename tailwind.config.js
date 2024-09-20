@@ -12,7 +12,7 @@ export default {
         darkGreen: '#006400',
       },
       fontFamily: {
-        'sleek': ['"Helvetica Neue"', 'Arial', 'sans-serif'],
+        'inter': ['"Inter"', 'sans-serif'],
       },
     },
   },

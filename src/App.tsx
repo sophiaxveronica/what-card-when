@@ -27,6 +27,13 @@ const categories = [
   'flights'
 ];
 
+const capitalizeWords = (str: string) => {
+  return str
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+};
+
 export default function Component() {
   const [cards, setCards] = useState<{ company: string; type: string }[]>([]);
   const [selectedCompany, setSelectedCompany] = useState('');
@@ -80,10 +87,10 @@ useEffect(() => {
   };
 
   return (
-    <div className="min-h-screen bg-lightGreen flex items-center justify-center p-8">
+<div className="min-h-screen bg-lightGreen flex items-center justify-center p-8">
       <div className="max-w-4xl w-full mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden">
         <div className="p-8">
-          <h1 className="text-5xl font-bold mb-8 text-center text-neonGreen animate-pulse">WHAT CARD WHEN?</h1>
+          <h1 className="text-5xl font-bold mb-8 text-center text-neonGreen">What Card When?</h1>
           <div className="space-y-8">
             <div>
               <Label htmlFor="category-select" className="text-lg font-medium text-darkGreen">
@@ -106,7 +113,7 @@ useEffect(() => {
                       className="form-checkbox h-5 w-5 text-neonGreen border-gray-300 rounded focus:ring-neonGreen"
                     />
                     <label htmlFor={category} className="ml-2 text-lg text-darkGreen hover:text-neonGreen transition duration-200">
-                      {category}
+                      {capitalizeWords(category)}
                     </label>
                   </div>
                 ))}
@@ -195,7 +202,7 @@ useEffect(() => {
             <div className="space-y-4">
               {results.map((category, index) => (
                 <div key={index} className="bg-white p-4 rounded-xl shadow-md">
-                  <h3 className="text-xl font-semibold text-neonGreen mb-2">{category.category}</h3>
+                  <h3 className="text-xl font-semibold text-neonGreen mb-2">{capitalizeWords(category.category)}</h3>
                   {category.bestCard ? (
                     <>
                       <p className="text-darkGreen">Best Card: <span className="font-medium">{`${category.bestCard.company} - ${category.bestCard.type}`}</span></p>
