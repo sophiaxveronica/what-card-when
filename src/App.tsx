@@ -25,41 +25,42 @@ const cardOptions = {
 }
 
 export default function Component() {
-  const [cards, setCards] = useState<CreditCard[]>([])
+  const [cards, setCards] = useState<{ company: string; type: string }[]>([]);
+  const [selectedCompany, setSelectedCompany] = useState('');
   const [showResults, setShowResults] = useState(false)
-  const [selectedCompany, setSelectedCompany] = useState('')
 
+  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+  
   const addCard = (type: string) => {
     if (cards.length < 6) {
-      setCards([...cards, { company: selectedCompany, type }])
+      setCards([...cards, { company: selectedCompany, type }]);
+      setSelectedTypes([...selectedTypes, type]);
     }
-  }
-
+  };
+  
   const removeCard = (index: number) => {
-    const newCards = cards.filter((_, i) => i !== index)
-    setCards(newCards)
-  }
+    const newCards = cards.filter((_, i) => i !== index);
+    setCards(newCards);
+  };
 
   const [results, setResults] = useState<SpendingCategory[]>([]);
 
   const generateResults = async () => {
     try {
-      const response = await fetch(`http://localhost:5001/api/cards/filter?company=${selectedCompany}&type=Gold`);
+      const response = await fetch('http://localhost:5001/api/cards/filter', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ cards }),
+      });
       const data = await response.json();
       setResults(data);
       setShowResults(true);
-      // Process the data as needed and update your state
     } catch (error) {
       console.error('Error fetching results:', error);
     }
   };
-
-  const dummyResults: SpendingCategory[] = [
-    { name: 'Groceries', bestCard: 'Chase Sapphire Preferred', cashback: 3 },
-    { name: 'Dining', bestCard: 'Amex Gold', cashback: 4 },
-    { name: 'Travel', bestCard: 'Capital One Venture', cashback: 2 },
-    { name: 'Gas', bestCard: 'Citi Premier', cashback: 3 },
-  ]
 
   return (
     <div className="min-h-screen bg-pink-100 p-8">
@@ -88,22 +89,22 @@ export default function Component() {
             </div>
             </div>
             {selectedCompany && (
-              <div>
-                <h2 className="text-2xl font-semibold mb-4 text-green-600">Select Cards:</h2>
-                <div className="flex flex-wrap gap-3">
-                  {cardOptions[selectedCompany as keyof typeof cardOptions].map((card: string) => (
-                    <button
-                      key={card}
-                      onClick={() => addCard(card)}
-                      className="px-6 py-3 bg-pink-500 text-white rounded-full hover:bg-pink-600 transform hover:scale-105 transition duration-200 shadow-md"
-                      disabled={cards.length >= 6}
-                    >
-                      {card}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
+  <div>
+    <h2 className="text-2xl font-semibold mb-4 text-green-600">Select Cards:</h2>
+    <div className="flex flex-wrap gap-3">
+      {cardOptions[selectedCompany as keyof typeof cardOptions].map((card: string) => (
+        <button
+          key={card}
+          onClick={() => addCard(card)}
+          className={`px-6 py-3 ${selectedTypes.includes(card) ? 'bg-green-500' : 'bg-pink-500'} text-white rounded-full hover:bg-pink-600 transform hover:scale-105 transition duration-200 shadow-md`}
+          disabled={cards.length >= 6}
+        >
+          {card}
+        </button>
+      ))}
+    </div>
+  </div>
+)}
             <div className="mt-6">
               <h2 className="text-2xl font-semibold mb-4 text-green-600">Selected Cards:</h2>
               <div className="space-y-3">
