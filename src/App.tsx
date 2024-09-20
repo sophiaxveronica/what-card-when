@@ -1,49 +1,66 @@
-import { useState } from 'react'
-import { PlusCircle, Trash2 } from 'lucide-react'
-import { Label } from '@radix-ui/react-label'
-import React from 'react'
-import './index.css'
+import { useEffect, useState } from 'react';
+import { Trash2 } from 'lucide-react';
+import { Label } from '@radix-ui/react-label';
+import React from 'react';
+import './index.css';
 
-type CreditCard = {
-  company: string
-  type: string
-}
 
 type SpendingCategory = {
-  name: string
-  bestCard: string
-  cashback: number
-}
+  category: string;
+  bestCard: {
+    company: string;
+    type: string;
+    percentage: number;
+  } | null;
+};
 
-const cardCompanies = ['Chase', 'Amex', 'Capital One', 'Citi']
 
-const cardOptions = {
-  Chase: ['Sapphire Preferred', 'Freedom Flex', 'Freedom Unlimited'],
-  Amex: ['Gold', 'Platinum', 'Green'],
-  'Capital One': ['Venture', 'Quicksilver', 'Savor'],
-  Citi: ['Premier', 'Double Cash', 'Custom Cash']
-}
+
+const categories = [
+  'dining',
+  'lyft',
+  'uber',
+  'public transport',
+  'groceries',
+  'gas',
+  'hotels',
+  'flights'
+];
 
 export default function Component() {
   const [cards, setCards] = useState<{ company: string; type: string }[]>([]);
   const [selectedCompany, setSelectedCompany] = useState('');
-  const [showResults, setShowResults] = useState(false)
+  const [showResults, setShowResults] = useState(false);
+  const [results, setResults] = useState<SpendingCategory[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [cardCompanies, setCardCompanies] = useState<string[]>([]);
+const [cardOptions, setCardOptions] = useState<string[]>([]);
 
-  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
-  
+
+useEffect(() => {
+  const fetchCardCompanies = async () => {
+    try {
+      const response = await fetch('http://localhost:5001/api/cards/companies');
+      const data = await response.json();
+      setCardCompanies(data);
+    } catch (error) {
+      console.error('Error fetching card companies:', error);
+    }
+  };
+
+  fetchCardCompanies();
+}, []);
+
   const addCard = (type: string) => {
     if (cards.length < 6) {
       setCards([...cards, { company: selectedCompany, type }]);
-      setSelectedTypes([...selectedTypes, type]);
     }
   };
-  
+
   const removeCard = (index: number) => {
     const newCards = cards.filter((_, i) => i !== index);
     setCards(newCards);
   };
-
-  const [results, setResults] = useState<SpendingCategory[]>([]);
 
   const generateResults = async () => {
     try {
@@ -52,7 +69,7 @@ export default function Component() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ cards }),
+        body: JSON.stringify({ cards, categories: selectedCategories }),
       });
       const data = await response.json();
       setResults(data);
@@ -68,43 +85,82 @@ export default function Component() {
         <div className="p-8">
           <h1 className="text-5xl font-bold mb-8 text-center text-pink-600 animate-pulse">WHAT CARD WHEN?</h1>
           <div className="space-y-8">
+          <div>
+  <Label htmlFor="category-select" className="text-lg font-medium text-green-700">
+    Select Categories
+  </Label>
+  <div className="space-y-8">
+    {categories.map((category) => (
+      <div key={category}>
+        <input
+          type="checkbox"
+          id={category}
+          value={category}
+          onChange={(e) => {
+            if (e.target.checked) {
+              setSelectedCategories([...selectedCategories, category]);
+            } else {
+              setSelectedCategories(selectedCategories.filter((c) => c !== category));
+            }
+          }}
+        />
+        <label htmlFor={category} className="ml-2">{category}</label>
+      </div>
+    ))}
+  </div>
+</div>
+            
             <div>
               <Label htmlFor="company-select" className="text-lg font-medium text-green-700">
                 Select Card Company
               </Label>
               <div className="space-y-8">
-              <select
-                id="company-select"
-                value={selectedCompany}
-                onChange={(e) => setSelectedCompany(e.target.value)}
-                className="mt-2 block w-full p-3 border-2 border-pink-300 rounded-xl focus:border-green-500 focus:ring focus:ring-green-200 transition duration-200"
-              >
-                <option value="">Select a company</option>
-                {cardCompanies.map((company) => (
-                  <option key={company} value={company}>
-                    {company}
-                  </option>
-                ))}
-              </select>
-            </div>
+                <select
+                  id="company-select"
+                  value={selectedCompany}
+                  onChange={async (e) => {
+                    const company = e.target.value;
+                    setSelectedCompany(company);
+                    try {
+                      const response = await fetch(`http://localhost:5001/api/cards/options/${company}`);
+                      const data = await response.json();
+                      setCardOptions(data);
+                    } catch (error) {
+                      console.error('Error fetching card options:', error);
+                    }
+                  }}
+                  className="mt-2 block w-full p-3 border-2 border-pink-300 rounded-xl focus:border-green-500 focus:ring focus:ring-green-200 transition duration-200"
+                >
+                  <option value="">Select a company</option>
+                  {cardCompanies.map((company) => (
+                    <option key={company} value={company}>
+                      {company}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
             {selectedCompany && (
-  <div>
-    <h2 className="text-2xl font-semibold mb-4 text-green-600">Select Cards:</h2>
-    <div className="flex flex-wrap gap-3">
-      {cardOptions[selectedCompany as keyof typeof cardOptions].map((card: string) => (
-        <button
-          key={card}
-          onClick={() => addCard(card)}
-          className={`px-6 py-3 ${selectedTypes.includes(card) ? 'bg-green-500' : 'bg-pink-500'} text-white rounded-full hover:bg-pink-600 transform hover:scale-105 transition duration-200 shadow-md`}
-          disabled={cards.length >= 6}
-        >
-          {card}
-        </button>
-      ))}
-    </div>
-  </div>
-)}
+              <div>
+                <h2 className="text-2xl font-semibold mb-4 text-green-600">Select Cards:</h2>
+                <div className="flex flex-wrap gap-3">
+  {Array.isArray(cardOptions) ? (
+    cardOptions.map((card: string, index: number) => (
+      <button
+        key={index}
+        onClick={() => addCard(card)}
+        className={`px-6 py-3 ${cards.some(c => c.type === card) ? 'bg-green-500' : 'bg-pink-500'} text-white rounded-full hover:bg-pink-600 transform hover:scale-105 transition duration-200 shadow-md`}
+        disabled={cards.length >= 6}
+      >
+        {card}
+      </button>
+    ))
+  ) : (
+    <p>No card options available</p>
+  )}
+</div>
+              </div>
+            )}
             <div className="mt-6">
               <h2 className="text-2xl font-semibold mb-4 text-green-600">Selected Cards:</h2>
               <div className="space-y-3">
@@ -136,9 +192,15 @@ export default function Component() {
             <div className="space-y-4">
               {results.map((category, index) => (
                 <div key={index} className="bg-white p-4 rounded-xl shadow-md">
-                  <h3 className="text-xl font-semibold text-pink-600 mb-2">{category.name}</h3>
-                  <p className="text-green-700">Best Card: <span className="font-medium">{category.bestCard}</span></p>
-                  <p className="text-green-700">Cashback: <span className="font-medium">{category.cashback}%</span></p>
+                  <h3 className="text-xl font-semibold text-pink-600 mb-2">{category.category}</h3>
+                  {category.bestCard ? (
+                    <>
+                      <p className="text-green-700">Best Card: <span className="font-medium">{`${category.bestCard.company} - ${category.bestCard.type}`}</span></p>
+                      <p className="text-green-700">Cashback: <span className="font-medium">{category.bestCard.percentage}%</span></p>
+                    </>
+                  ) : (
+                    <p className="text-red-500">No card available for this category</p>
+                  )}
                 </div>
               ))}
             </div>
@@ -146,5 +208,5 @@ export default function Component() {
         )}
       </div>
     </div>
-  )
+  );
 }
