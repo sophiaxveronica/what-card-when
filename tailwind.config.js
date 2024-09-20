@@ -6,9 +6,13 @@ export default {
   ],
   theme: {
     extend: {
+      colors: {
+        neonGreen: '#39FF14',
+        lightGreen: '#d4f5d4',
+        darkGreen: '#006400',
+      },
       fontFamily: {
-        'dela': ['"Dela Gothic One"', 'cursive'],
-        'sans': ['Arial', 'Helvetica', 'sans-serif'],
+        'sleek': ['"Helvetica Neue"', 'Arial', 'sans-serif'],
       },
     },
   },
