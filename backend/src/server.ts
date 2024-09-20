@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import mongoose from 'mongoose';
+import Airtable from 'airtable';
 import dotenv from 'dotenv';
 import cardsRouter from './routes/cards';
 
@@ -13,12 +13,14 @@ app.use(cors());
 app.use(express.json());
 app.use('/api/cards', cardsRouter);
 
-mongoose.connect(process.env.MONGODB_URI as string);
-const connection = mongoose.connection;
-connection.once('open', () => {
-  console.log('MongoDB database connection established successfully');
-});
-
-app.listen(port, () => {
-  console.log(`Server is running on port: ${port}`);
-});
+Airtable.configure({
+    apiKey: process.env.AIRTABLE_API_KEY,
+    endpointUrl: 'https://api.airtable.com',
+  });
+  const base = Airtable.base(process.env.AIRTABLE_BASE_ID!);
+  
+  app.listen(port, () => {
+    console.log(`Server is running on port: ${port}`);
+  });
+  
+  export { base };
