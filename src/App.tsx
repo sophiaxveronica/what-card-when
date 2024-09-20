@@ -90,7 +90,9 @@ useEffect(() => {
 <div className="min-h-screen bg-lightGreen flex items-center justify-center p-8">
       <div className="max-w-4xl w-full mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden">
         <div className="p-8">
-          <h1 className="text-5xl font-bold mb-8 text-center text-neonGreen">What Card When?</h1>
+        <h1 className="text-5xl font-bold mb-8 text-center gradient-text">
+            What Card When?
+          </h1>
           <div className="space-y-8">
             <div>
               <Label htmlFor="category-select" className="text-lg font-medium text-darkGreen">
@@ -197,11 +199,11 @@ useEffect(() => {
           </button>
         </div>
         {showResults && (
-          <div className="bg-white p-8 rounded-t-3xl mt-8">
+          <div className="bg-white p-8 rounded-t-3xl mt-8 ">
             <h2 className="text-3xl font-bold mb-6 text-darkGreen">Your Optimal Card Usage:</h2>
             <div className="space-y-4">
               {results.map((category, index) => (
-                <div key={index} className="bg-white p-4 rounded-xl shadow-md">
+                <div key={index} className="bg-white p-4 rounded-xl shadow-md border-2 border-darkGreen">
                   <h3 className="text-xl font-semibold text-neonGreen mb-2">{capitalizeWords(category.category)}</h3>
                   {category.bestCard ? (
                     <>
