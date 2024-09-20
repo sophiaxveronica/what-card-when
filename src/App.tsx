@@ -80,38 +80,41 @@ useEffect(() => {
   };
 
   return (
-    <div className="min-h-screen bg-pink-100 p-8">
-      <div className="max-w-4xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden">
+    <div className="min-h-screen bg-lightGreen flex items-center justify-center p-8">
+      <div className="max-w-4xl w-full mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden">
         <div className="p-8">
-          <h1 className="text-5xl font-bold mb-8 text-center text-pink-600 animate-pulse">WHAT CARD WHEN?</h1>
+          <h1 className="text-5xl font-bold mb-8 text-center text-neonGreen animate-pulse">WHAT CARD WHEN?</h1>
           <div className="space-y-8">
-          <div>
-  <Label htmlFor="category-select" className="text-lg font-medium text-green-700">
-    Select Categories
-  </Label>
-  <div className="space-y-8">
-    {categories.map((category) => (
-      <div key={category}>
-        <input
-          type="checkbox"
-          id={category}
-          value={category}
-          onChange={(e) => {
-            if (e.target.checked) {
-              setSelectedCategories([...selectedCategories, category]);
-            } else {
-              setSelectedCategories(selectedCategories.filter((c) => c !== category));
-            }
-          }}
-        />
-        <label htmlFor={category} className="ml-2">{category}</label>
-      </div>
-    ))}
-  </div>
-</div>
+            <div>
+              <Label htmlFor="category-select" className="text-lg font-medium text-darkGreen">
+                Select Categories
+              </Label>
+              <div className="space-y-4 mt-2 border border-darkGreen rounded-lg p-4 bg-gray-50">
+                {categories.map((category) => (
+                  <div key={category} className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id={category}
+                      value={category}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedCategories([...selectedCategories, category]);
+                        } else {
+                          setSelectedCategories(selectedCategories.filter((c) => c !== category));
+                        }
+                      }}
+                      className="form-checkbox h-5 w-5 text-neonGreen border-gray-300 rounded focus:ring-neonGreen"
+                    />
+                    <label htmlFor={category} className="ml-2 text-lg text-darkGreen hover:text-neonGreen transition duration-200">
+                      {category}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </div>
             
             <div>
-              <Label htmlFor="company-select" className="text-lg font-medium text-green-700">
+              <Label htmlFor="company-select" className="text-lg font-medium text-darkGreen">
                 Select Card Company
               </Label>
               <div className="space-y-8">
@@ -129,7 +132,7 @@ useEffect(() => {
                       console.error('Error fetching card options:', error);
                     }
                   }}
-                  className="mt-2 block w-full p-3 border-2 border-pink-300 rounded-xl focus:border-green-500 focus:ring focus:ring-green-200 transition duration-200"
+                  className="mt-2 block w-full p-3 border-2 border-darkGreen rounded-xl focus:border-neonGreen focus:ring focus:ring-neonGreen transition duration-200"
                 >
                   <option value="">Select a company</option>
                   {cardCompanies.map((company) => (
@@ -142,34 +145,34 @@ useEffect(() => {
             </div>
             {selectedCompany && (
               <div>
-                <h2 className="text-2xl font-semibold mb-4 text-green-600">Select Cards:</h2>
+                <h2 className="text-2xl font-semibold mb-4 text-darkGreen">Select Cards:</h2>
                 <div className="flex flex-wrap gap-3">
-  {Array.isArray(cardOptions) ? (
-    cardOptions.map((card: string, index: number) => (
-      <button
-        key={index}
-        onClick={() => addCard(card)}
-        className={`px-6 py-3 ${cards.some(c => c.type === card) ? 'bg-green-500' : 'bg-pink-500'} text-white rounded-full hover:bg-pink-600 transform hover:scale-105 transition duration-200 shadow-md`}
-        disabled={cards.length >= 6}
-      >
-        {card}
-      </button>
-    ))
-  ) : (
-    <p>No card options available</p>
-  )}
-</div>
+                  {Array.isArray(cardOptions) ? (
+                    cardOptions.map((card: string, index: number) => (
+                      <button
+                        key={index}
+                        onClick={() => addCard(card)}
+                        className={`px-6 py-3 ${cards.some(c => c.type === card) ? 'bg-darkGreen' : 'bg-neonGreen'} text-white rounded-full hover:bg-darkGreen transform hover:scale-105 transition duration-200 shadow-md`}
+                        disabled={cards.length >= 6}
+                      >
+                        {card}
+                      </button>
+                    ))
+                  ) : (
+                    <p>No card options available</p>
+                  )}
+                </div>
               </div>
             )}
             <div className="mt-6">
-              <h2 className="text-2xl font-semibold mb-4 text-green-600">Selected Cards:</h2>
+              <h2 className="text-2xl font-semibold mb-4 text-darkGreen">Selected Cards:</h2>
               <div className="space-y-3">
                 {cards.map((card, index) => (
-                  <div key={index} className="flex items-center justify-between bg-green-100 p-4 rounded-xl shadow-sm">
-                    <span className="text-lg text-pink-700 font-medium">{`${card.company} - ${card.type}`}</span>
+                  <div key={index} className="flex items-center justify-between bg-neonGreen p-4 rounded-xl shadow-sm">
+                    <span className="text-lg text-darkGreen font-medium">{`${card.company} - ${card.type}`}</span>
                     <button
                       onClick={() => removeCard(index)}
-                      className="text-pink-500 hover:text-pink-700 transform hover:scale-110 transition duration-200"
+                      className="text-darkGreen hover:text-neonGreen transform hover:scale-110 transition duration-200"
                     >
                       <Trash2 className="h-6 w-6" />
                     </button>
@@ -180,23 +183,23 @@ useEffect(() => {
           </div>
           <button 
             onClick={generateResults} 
-            className="mt-8 w-full bg-green-500 hover:bg-green-600 text-white py-4 rounded-full text-xl font-bold shadow-lg transform hover:scale-105 transition duration-200"
+            className="mt-8 w-full bg-darkGreen hover:bg-neonGreen text-white py-4 rounded-full text-xl font-bold shadow-lg transform hover:scale-105 transition duration-200"
             disabled={cards.length === 0}
           >
             Generate Results
           </button>
         </div>
         {showResults && (
-          <div className="bg-pink-100 p-8 rounded-t-3xl mt-8">
-            <h2 className="text-3xl font-bold mb-6 text-green-700">Your Optimal Card Usage:</h2>
+          <div className="bg-white p-8 rounded-t-3xl mt-8">
+            <h2 className="text-3xl font-bold mb-6 text-darkGreen">Your Optimal Card Usage:</h2>
             <div className="space-y-4">
               {results.map((category, index) => (
                 <div key={index} className="bg-white p-4 rounded-xl shadow-md">
-                  <h3 className="text-xl font-semibold text-pink-600 mb-2">{category.category}</h3>
+                  <h3 className="text-xl font-semibold text-neonGreen mb-2">{category.category}</h3>
                   {category.bestCard ? (
                     <>
-                      <p className="text-green-700">Best Card: <span className="font-medium">{`${category.bestCard.company} - ${category.bestCard.type}`}</span></p>
-                      <p className="text-green-700">Cashback: <span className="font-medium">{category.bestCard.percentage}%</span></p>
+                      <p className="text-darkGreen">Best Card: <span className="font-medium">{`${category.bestCard.company} - ${category.bestCard.type}`}</span></p>
+                      <p className="text-darkGreen">Cashback: <span className="font-medium">{category.bestCard.percentage}%</span></p>
                     </>
                   ) : (
                     <p className="text-red-500">No card available for this category</p>
