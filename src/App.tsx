@@ -42,7 +42,95 @@ export default function Component() {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [cardCompanies, setCardCompanies] = useState<string[]>([]);
 const [cardOptions, setCardOptions] = useState<string[]>([]);
+const [email, setEmail] = useState('');
+const [isValidEmail, setIsValidEmail] = useState(false);
+const [name, setName] = useState('');
+const [formError, setFormError] = useState('');
 
+
+const validateEmail = (email: string) => {
+  const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  return re.test(email);
+};
+
+const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const newEmail = e.target.value;
+  setEmail(newEmail);
+  setIsValidEmail(validateEmail(newEmail));
+  setFormError('');
+};
+
+const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  setName(e.target.value);
+  setFormError('');
+};
+
+const isFormValid = () => {
+  return (
+    selectedCategories.length > 0 &&
+    cards.length > 0 &&
+    isValidEmail &&
+    name.trim() !== ''
+  );
+};
+
+function generateResultsEmail(results: SpendingCategory[], name: string, cards: { company: string; type: string }[]): string {
+  const cardList = cards.map(card => `${card.company} ${card.type}`).join(', ');
+  
+  return `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f0f8f0;">
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f0f8f0;">
+      <table cellpadding="0" cellspacing="0" border="0" width="100%">
+        <tr>
+          <td style="padding: 0 0 20px 0;">
+            <p style="color: #006400; font-size: 18px; margin: 0;">Hi ${name}!</p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 0 0 20px 0;">
+            <p style="color: #006400; font-size: 18px; margin: 0;">Thanks for using WhatCardWhen.</p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 0 0 20px 0;">
+            <p style="color: #006400; font-size: 18px; margin: 0;">Here's what we recommend for you given these inputted cards:<br>${cardList}.</p>
+          </td>
+        </tr>
+      </table>      
+      <h2 style="color: #006400; font-size: 24px; margin-bottom: 20px;">Your Optimal Card Usage:</h2>
+      ${results.map((category, index) => `
+        <div style="background-color: #ffffff; border: 2px solid #006400; border-radius: 10px; padding: 15px; margin-bottom: 15px;">
+          <h3 style="color: #00ff00; font-size: 18px; margin-top: 0; margin-bottom: 10px;">${capitalizeWords(category.category)}</h3>
+          ${category.bestCard 
+            ? `
+              <p style="color: #006400; margin: 5px 0;">Best Card: <strong>${category.bestCard.company} - ${category.bestCard.type}</strong></p>
+              <p style="color: #006400; margin: 5px 0;">Cashback: <strong>${category.bestCard.percentage}%</strong></p>
+            `
+            : `<p style="color: #ff0000; margin: 5px 0;">No card available for this category</p>`
+          }
+        </div>
+      `).join('')}
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f0f8f0;">
+      <table cellpadding="0" cellspacing="0" border="0" width="100%">
+        <tr>
+          <td style="padding: 0 0 20px 0;">
+            <p style="color: #006400; font-size: 18px; margin: 0;">We're actively building WhatCardWhen.</p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 0 0 20px 0;">
+            <p style="color: #006400; font-size: 18px; margin: 0;">Let us know what you think!</p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 0 0 20px 0;">
+            <p style="color: #006400; font-size: 18px; margin: 0;">Best,<br>the WCW team</p>
+          </td>
+        </tr>
+      </table>
+    </div>
+  `;
+}
 
 useEffect(() => {
   const fetchCardCompanies = async () => {
@@ -62,11 +150,27 @@ useEffect(() => {
     if (cards.length < 6) {
       setCards([...cards, { company: selectedCompany, type }]);
     }
+    setFormError('');
   };
 
   const removeCard = (index: number) => {
     const newCards = cards.filter((_, i) => i !== index);
     setCards(newCards);
+    setFormError('');
+  };
+
+  const handleGenerateResults = () => {
+    if (!isFormValid()) {
+      let errorMessage = '';
+      if (selectedCategories.length === 0) errorMessage += 'Please select at least one category. ';
+      if (cards.length === 0) errorMessage += 'Please add at least one card. ';
+      if (!isValidEmail) errorMessage += 'Please enter a valid email address. ';
+      if (name.trim() === '') errorMessage += 'Please fill in your name. ';
+      setFormError(errorMessage.trim());
+    } else {
+      setFormError('');
+      generateResults();
+    }
   };
 
   const generateResults = async () => {
@@ -81,6 +185,23 @@ useEffect(() => {
       const data = await response.json();
       setResults(data);
       setShowResults(true);
+
+      const htmlString = generateResultsEmail(data, name, cards);
+      console.log(htmlString);
+        // Call the new endpoint to trigger email sending
+      const emailResponse = await fetch('http://localhost:5001/api/emails/send', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ to: email, name: name, subject: 'HI THERE', html: htmlString }),
+      });
+
+      if (!emailResponse.ok) {
+        throw new Error('Failed to send results email');
+      }
+
+      console.log('Results email sent successfully');
     } catch (error) {
       console.error('Error fetching results:', error);
     }
@@ -110,7 +231,8 @@ useEffect(() => {
                           setSelectedCategories([...selectedCategories, category]);
                         } else {
                           setSelectedCategories(selectedCategories.filter((c) => c !== category));
-                        }
+                        };
+                        setFormError('');
                       }}
                       className="form-checkbox h-5 w-5 text-neonGreen border-gray-300 rounded focus:ring-neonGreen"
                     />
@@ -190,13 +312,55 @@ useEffect(() => {
               </div>
             </div>
           </div>
-          <button 
-            onClick={generateResults} 
-            className="mt-8 w-full bg-darkGreen hover:bg-neonGreen text-white py-4 rounded-full text-xl font-bold shadow-lg transform hover:scale-105 transition duration-200"
-            disabled={cards.length === 0}
-          >
-            Generate Results
-          </button>
+          <div className="mt-6 space-y-4">
+        <div>
+          <Label htmlFor="name-input" className="text-lg font-medium text-darkGreen">
+            Enter your name
+          </Label>
+          <input
+            id="name-input"
+            type="text"
+            value={name}
+            onChange={handleNameChange}
+            className="mt-2 block w-full p-3 border-2 border-darkGreen rounded-xl focus:ring focus:ring-neonGreen transition duration-200"
+            placeholder="Your Name"
+          />
+        </div>
+        <div>
+          <Label htmlFor="email-input" className="text-lg font-medium text-darkGreen">
+            Enter your email to receive results
+          </Label>
+          <input
+            id="email-input"
+            type="email"
+            value={email}
+            onChange={handleEmailChange}
+            className={`mt-2 block w-full p-3 border-2 ${
+              isValidEmail ? 'border-neonGreen' : 'border-darkGreen'        
+            } rounded-xl focus:ring focus:ring-neonGreen transition duration-200`}
+            placeholder="your@email.com"
+          />
+          {email && !isValidEmail && (
+            <p className="mt-1 text-red-500">Please enter a valid email address</p>
+          )}
+        </div>
+      </div>
+      <div className="mt-8">
+        <button 
+          onClick={handleGenerateResults} 
+          className={`w-full py-4 rounded-full text-xl font-bold shadow-lg transform transition duration-200 
+            ${isFormValid() 
+              ? 'bg-darkGreen hover:bg-neonGreen text-white hover:scale-105' 
+              : 'bg-gray-400 text-gray-600 cursor-not-allowed'}`}
+        >
+          Generate and Email Results
+        </button>
+        {formError && (
+          <p className="mt-2 text-red-500 text-center">
+            {formError}
+          </p>
+        )}
+      </div>
         </div>
         {showResults && (
           <div className="bg-white p-8 rounded-t-3xl mt-8 ">

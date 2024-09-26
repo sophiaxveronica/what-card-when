@@ -3,6 +3,7 @@ import cors from 'cors';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cardsRouter from './routes/cards';
+import emailsRouter from './routes/emails';
 
 dotenv.config();
 
@@ -12,6 +13,7 @@ const port = 5001;
 app.use(cors());
 app.use(express.json());
 app.use('/api/cards', cardsRouter);
+app.use('/api/emails', emailsRouter);
 
 mongoose.connect(process.env.MONGODB_URI as string);
 const connection = mongoose.connection;
