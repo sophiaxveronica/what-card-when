@@ -4,7 +4,6 @@ import { Label } from '@radix-ui/react-label';
 import React from 'react';
 import './index.css';
 
-
 type SpendingCategory = {
   category: string;
   bestCard: {
@@ -13,8 +12,6 @@ type SpendingCategory = {
     percentage: number;
   } | null;
 };
-
-
 
 const categories = [
   'dining',
@@ -41,43 +38,43 @@ export default function Component() {
   const [results, setResults] = useState<SpendingCategory[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [cardCompanies, setCardCompanies] = useState<string[]>([]);
-const [cardOptions, setCardOptions] = useState<string[]>([]);
-const [email, setEmail] = useState('');
-const [isValidEmail, setIsValidEmail] = useState(false);
-const [name, setName] = useState('');
-const [formError, setFormError] = useState('');
+  const [cardOptions, setCardOptions] = useState<string[]>([]);
+  const [email, setEmail] = useState('');
+  const [isValidEmail, setIsValidEmail] = useState(false);
+  const [name, setName] = useState('');
+  const [formError, setFormError] = useState('');
 
 
-const validateEmail = (email: string) => {
-  const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-  return re.test(email);
-};
+  const validateEmail = (email: string) => {
+    const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return re.test(email);
+  };
 
-const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  const newEmail = e.target.value;
-  setEmail(newEmail);
-  setIsValidEmail(validateEmail(newEmail));
-  setFormError('');
-};
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newEmail = e.target.value;
+    setEmail(newEmail);
+    setIsValidEmail(validateEmail(newEmail));
+    setFormError('');
+  };
 
-const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  setName(e.target.value);
-  setFormError('');
-};
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setName(e.target.value);
+    setFormError('');
+  };
 
-const isFormValid = () => {
-  return (
-    selectedCategories.length > 0 &&
-    cards.length > 0 &&
-    isValidEmail &&
-    name.trim() !== ''
-  );
-};
+  const isFormValid = () => {
+    return (
+      selectedCategories.length > 0 &&
+      cards.length > 0 &&
+      isValidEmail &&
+      name.trim() !== ''
+    );
+  };
 
-function generateResultsEmail(results: SpendingCategory[], name: string, cards: { company: string; type: string }[]): string {
-  const cardList = cards.map(card => `${card.company} ${card.type}`).join(', ');
-  
-  return `
+  function generateResultsEmail(results: SpendingCategory[], name: string, cards: { company: string; type: string }[]): string {
+    const cardList = cards.map(card => `${card.company} ${card.type}`).join(', ');
+
+    return `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f0f8f0;">
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f0f8f0;">
       <table cellpadding="0" cellspacing="0" border="0" width="100%">
@@ -101,13 +98,13 @@ function generateResultsEmail(results: SpendingCategory[], name: string, cards: 
       ${results.map((category, index) => `
         <div style="background-color: #ffffff; border: 2px solid #006400; border-radius: 10px; padding: 15px; margin-bottom: 15px;">
           <h3 style="color: #00ff00; font-size: 18px; margin-top: 0; margin-bottom: 10px;">${capitalizeWords(category.category)}</h3>
-          ${category.bestCard 
-            ? `
+          ${category.bestCard
+        ? `
               <p style="color: #006400; margin: 5px 0;">Best Card: <strong>${category.bestCard.company} - ${category.bestCard.type}</strong></p>
               <p style="color: #006400; margin: 5px 0;">Cashback: <strong>${category.bestCard.percentage}%</strong></p>
             `
-            : `<p style="color: #ff0000; margin: 5px 0;">No card available for this category</p>`
-          }
+        : `<p style="color: #ff0000; margin: 5px 0;">No card available for this category</p>`
+      }
         </div>
       `).join('')}
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f0f8f0;">
@@ -130,21 +127,21 @@ function generateResultsEmail(results: SpendingCategory[], name: string, cards: 
       </table>
     </div>
   `;
-}
+  }
 
-useEffect(() => {
-  const fetchCardCompanies = async () => {
-    try {
-      const response = await fetch('http://localhost:5001/api/cards/companies');
-      const data = await response.json();
-      setCardCompanies(data);
-    } catch (error) {
-      console.error('Error fetching card companies:', error);
-    }
-  };
+  useEffect(() => {
+    const fetchCardCompanies = async () => {
+      try {
+        const response = await fetch('http://localhost:5001/api/cards/companies');
+        const data = await response.json();
+        setCardCompanies(data);
+      } catch (error) {
+        console.error('Error fetching card companies:', error);
+      }
+    };
 
-  fetchCardCompanies();
-}, []);
+    fetchCardCompanies();
+  }, []);
 
   const addCard = (type: string) => {
     if (cards.length < 6) {
@@ -188,7 +185,7 @@ useEffect(() => {
 
       const htmlString = generateResultsEmail(data, name, cards);
       console.log(htmlString);
-        // Call the new endpoint to trigger email sending
+      // Call the new endpoint to trigger email sending
       const emailResponse = await fetch('http://localhost:5001/api/emails/send', {
         method: 'POST',
         headers: {
@@ -208,10 +205,10 @@ useEffect(() => {
   };
 
   return (
-<div className="min-h-screen bg-lightGreen flex items-center justify-center p-8">
+    <div className="min-h-screen bg-lightGreen flex items-center justify-center p-8">
       <div className="max-w-4xl w-full mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden border-4 border-darkGreen">
         <div className="p-8">
-        <h1 className="text-5xl font-bold mb-8 text-center gradient-text">
+          <h1 className="text-5xl font-bold mb-8 text-center gradient-text">
             What Card When?
           </h1>
           <div className="space-y-8">
@@ -243,7 +240,7 @@ useEffect(() => {
                 ))}
               </div>
             </div>
-            
+
             <div>
               <Label htmlFor="company-select" className="text-lg font-medium text-darkGreen">
                 Select Card Company
@@ -313,54 +310,53 @@ useEffect(() => {
             </div>
           </div>
           <div className="mt-6 space-y-4">
-        <div>
-          <Label htmlFor="name-input" className="text-lg font-medium text-darkGreen">
-            Enter your name
-          </Label>
-          <input
-            id="name-input"
-            type="text"
-            value={name}
-            onChange={handleNameChange}
-            className="mt-2 block w-full p-3 border-2 border-darkGreen rounded-xl focus:ring focus:ring-neonGreen transition duration-200"
-            placeholder="Your Name"
-          />
-        </div>
-        <div>
-          <Label htmlFor="email-input" className="text-lg font-medium text-darkGreen">
-            Enter your email to receive results
-          </Label>
-          <input
-            id="email-input"
-            type="email"
-            value={email}
-            onChange={handleEmailChange}
-            className={`mt-2 block w-full p-3 border-2 ${
-              isValidEmail ? 'border-neonGreen' : 'border-darkGreen'        
-            } rounded-xl focus:ring focus:ring-neonGreen transition duration-200`}
-            placeholder="your@email.com"
-          />
-          {email && !isValidEmail && (
-            <p className="mt-1 text-red-500">Please enter a valid email address</p>
-          )}
-        </div>
-      </div>
-      <div className="mt-8">
-        <button 
-          onClick={handleGenerateResults} 
-          className={`w-full py-4 rounded-full text-xl font-bold shadow-lg transform transition duration-200 
-            ${isFormValid() 
-              ? 'bg-darkGreen hover:bg-neonGreen text-white hover:scale-105' 
-              : 'bg-gray-400 text-gray-600 cursor-not-allowed'}`}
-        >
-          Generate and Email Results
-        </button>
-        {formError && (
-          <p className="mt-2 text-red-500 text-center">
-            {formError}
-          </p>
-        )}
-      </div>
+            <div>
+              <Label htmlFor="name-input" className="text-lg font-medium text-darkGreen">
+                Enter your name
+              </Label>
+              <input
+                id="name-input"
+                type="text"
+                value={name}
+                onChange={handleNameChange}
+                className="mt-2 block w-full p-3 border-2 border-darkGreen rounded-xl focus:ring focus:ring-neonGreen transition duration-200"
+                placeholder="Your Name"
+              />
+            </div>
+            <div>
+              <Label htmlFor="email-input" className="text-lg font-medium text-darkGreen">
+                Enter your email to receive results
+              </Label>
+              <input
+                id="email-input"
+                type="email"
+                value={email}
+                onChange={handleEmailChange}
+                className={`mt-2 block w-full p-3 border-2 ${isValidEmail ? 'border-neonGreen' : 'border-darkGreen'
+                  } rounded-xl focus:ring focus:ring-neonGreen transition duration-200`}
+                placeholder="your@email.com"
+              />
+              {email && !isValidEmail && (
+                <p className="mt-1 text-red-500">Please enter a valid email address</p>
+              )}
+            </div>
+          </div>
+          <div className="mt-8">
+            <button
+              onClick={handleGenerateResults}
+              className={`w-full py-4 rounded-full text-xl font-bold shadow-lg transform transition duration-200 
+            ${isFormValid()
+                  ? 'bg-darkGreen hover:bg-neonGreen text-white hover:scale-105'
+                  : 'bg-gray-400 text-gray-600 cursor-not-allowed'}`}
+            >
+              Generate and Email Results
+            </button>
+            {formError && (
+              <p className="mt-2 text-red-500 text-center">
+                {formError}
+              </p>
+            )}
+          </div>
         </div>
         {showResults && (
           <div className="bg-white p-8 rounded-t-3xl mt-8 ">
