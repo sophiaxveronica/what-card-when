@@ -27,10 +27,9 @@ router.post('/send', async (req, res) => {
 });
 
 // Add user to contact list
-// Unfortunately we can't add custom data, 
-// so we have no way to pass the cards list here
 router.post('/add-contact', async (req, res) => {
   try {
+    // Unfortunately we can't add custom data like the cards list here
     const { name, email } = req.body;
 
     const result = await resend.contacts.create({

@@ -1,6 +1,7 @@
 import { SpendingCategory } from '../types';
 import { capitalizeWords } from './stringUtils';
 
+// This is the email that we send users when they use What Card When to generate results
 export function generateResultsEmail(results: SpendingCategory[], name: string, cards: { company: string; type: string }[]): string {
     const cardList = cards.map(card => `${card.company} ${card.type}`).join(', ');
 
@@ -46,12 +47,7 @@ export function generateResultsEmail(results: SpendingCategory[], name: string, 
         </tr>
         <tr>
           <td style="padding: 0 0 20px 0;">
-            <p style="color: #006400; font-size: 18px; margin: 0;">Let us know what you think!</p>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding: 0 0 20px 0;">
-            <p style="color: #006400; font-size: 18px; margin: 0;">Best,<br>the WCW team</p>
+            <p style="color: #006400; font-size: 18px; margin: 0;">Let us know what you think!! We're a team of 2 and we read every email.💕</p>
           </td>
         </tr>
       </table>

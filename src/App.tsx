@@ -9,6 +9,8 @@ import { generateResultsEmail } from './utils/emailUtils';
 import { fetchCardCompanies, fetchCardOptions, generateResults, sendResultsEmail } from './utils/apiUtils';
 import { SpendingCategory, Card } from './types';
 
+const timeoutPromise = (ms: number) => new Promise((_, reject) => setTimeout(() => reject(new Error('Request timed out')), ms));
+
 const SELECTED_CARD_LIMIT = 6;
 
 const categories = [
@@ -34,6 +36,7 @@ export default function Component() {
   const [isValidEmail, setIsValidEmail] = useState(false);
   const [name, setName] = useState('');
   const [formError, setFormError] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     fetchCardCompanies().then(setCardCompanies);
@@ -79,15 +82,25 @@ export default function Component() {
       setFormError(errorMessage.trim());
     } else {
       setFormError('');
+      setErrorMessage('');
       try {
-        const data = await generateResults(cards, selectedCategories);
+        const timeoutDuration = 3000; // 3 second timeout
+        const data = await Promise.race([
+          generateResults(cards, selectedCategories),
+          timeoutPromise(timeoutDuration)
+        ]);
         setResults(data);
         setShowResults(true);
   
         const htmlString = generateResultsEmail(data, name, cards);
-        await sendResultsEmail(email, name, htmlString);
+        await Promise.race([
+          sendResultsEmail(email, name, htmlString),
+          timeoutPromise(timeoutDuration)
+        ]);
       } catch (error) {
+        // TODO: what's an easy way to get alerted about something like this?
         console.error('Error generating or sending results:', error);
+        setErrorMessage("Hmm, something went wrong, sorry about that!");
       }
     }
   };
@@ -196,11 +209,15 @@ export default function Component() {
 
             <div className="mt-6">
               <h2 className="text-2xl font-semibold mb-4 text-darkGreen">Selected Cards:</h2>
-                {cards.length === SELECTED_CARD_LIMIT && (
+                {cards.length === SELECTED_CARD_LIMIT ? (
                   <p className="mb-4 text-yellow-600 font-medium">
                     You can select up to {SELECTED_CARD_LIMIT} cards.
                   </p>
-                )}
+                ) : cards.length === 0 ? (
+                  <p className="mb-4 text-gray-600 font-medium">
+                    No cards selected.
+                  </p>
+                ) : null}
               <div className="flex flex-wrap gap-4">
                 {cards.map((card, index) => (
                   <div key={index} className="bg-neonGreen rounded-xl shadow-sm" style={{ width: '180px', aspectRatio: '1.586' }}>
@@ -257,6 +274,8 @@ export default function Component() {
           </div>
           <div className="mt-8">
             <button
+              // TODO: should we disable the button once it's been clicked until the user changes 
+              // something, like adds a card, unchecks a category, or changes their email? 
               onClick={handleGenerateResults}
               className={`w-full py-4 rounded-full text-xl font-bold shadow-lg transform transition duration-200 
             ${isFormValid(selectedCategories,cards,isValidEmail,name)
@@ -269,6 +288,11 @@ export default function Component() {
               <p className="mt-2 text-red-500 text-center">
                 {formError}
               </p>
+            )}
+            {errorMessage && (
+            <p className="mt-2 text-red-500 text-center">
+              {errorMessage}
+            </p>
             )}
           </div>
         </div>
