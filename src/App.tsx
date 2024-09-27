@@ -144,7 +144,7 @@ export default function Component() {
   }, []);
 
   const addCard = (type: string) => {
-    if (cards.length < 6) {
+    if (cards.length < 6 && !cards.some(card => card.company === selectedCompany && card.type === type)) {
       setCards([...cards, { company: selectedCompany, type }]);
     }
     setFormError('');
@@ -271,21 +271,30 @@ export default function Component() {
                 </select>
               </div>
             </div>
+
             {selectedCompany && (
+              
               <div>
                 <h2 className="text-2xl font-semibold mb-4 text-darkGreen">Select Cards:</h2>
                 <div className="flex flex-wrap gap-3">
                   {Array.isArray(cardOptions) ? (
-                    cardOptions.map((card: string, index: number) => (
-                      <button
-                        key={index}
-                        onClick={() => addCard(card)}
-                        className={`px-6 py-3 ${cards.some(c => c.type === card) ? 'bg-darkGreen' : 'bg-neonGreen'} text-white rounded-full hover:bg-darkGreen transform hover:scale-105 transition duration-200 shadow-md`}
-                        disabled={cards.length >= 6}
-                      >
-                        {card}
-                      </button>
-                    ))
+                    cardOptions.map((card: string, index: number) => {
+                      const isCardSelected = cards.some(c => c.company === selectedCompany && c.type === card);
+                      return (
+                        <button
+                          key={index}
+                          onClick={() => addCard(card)}
+                          className={`px-6 py-3 ${
+                            isCardSelected 
+                              ? 'bg-gray-400 cursor-not-allowed' 
+                              : 'bg-neonGreen hover:bg-darkGreen'
+                          } text-white rounded-full transform hover:scale-105 transition duration-200 shadow-md`}
+                          disabled={isCardSelected || cards.length >= 6}
+                        >
+                          {card}
+                        </button>
+                      );
+                    })
                   ) : (
                     <p>No card options available</p>
                   )}
