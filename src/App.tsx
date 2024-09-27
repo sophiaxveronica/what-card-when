@@ -4,6 +4,8 @@ import { Label } from '@radix-ui/react-label';
 import React from 'react';
 import './index.css';
 
+const SELECTED_CARD_LIMIT = 6;
+
 type SpendingCategory = {
   category: string;
   bestCard: {
@@ -43,7 +45,6 @@ export default function Component() {
   const [isValidEmail, setIsValidEmail] = useState(false);
   const [name, setName] = useState('');
   const [formError, setFormError] = useState('');
-
 
   const validateEmail = (email: string) => {
     const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -144,7 +145,7 @@ export default function Component() {
   }, []);
 
   const addCard = (type: string) => {
-    if (cards.length < 6 && !cards.some(card => card.company === selectedCompany && card.type === type)) {
+    if (!cards.some(card => card.company === selectedCompany && card.type === type)) {
       setCards([...cards, { company: selectedCompany, type }]);
     }
     setFormError('');
@@ -272,8 +273,8 @@ export default function Component() {
               </div>
             </div>
 
+
             {selectedCompany && (
-              
               <div>
                 <h2 className="text-2xl font-semibold mb-4 text-darkGreen">Select Cards:</h2>
                 <div className="flex flex-wrap gap-3">
@@ -285,11 +286,11 @@ export default function Component() {
                           key={index}
                           onClick={() => addCard(card)}
                           className={`px-6 py-3 ${
-                            isCardSelected 
+                            isCardSelected || cards.length >= SELECTED_CARD_LIMIT
                               ? 'bg-gray-400 cursor-not-allowed' 
                               : 'bg-neonGreen hover:bg-darkGreen'
                           } text-white rounded-full transform hover:scale-105 transition duration-200 shadow-md`}
-                          disabled={isCardSelected || cards.length >= 6}
+                          disabled={isCardSelected || cards.length >= SELECTED_CARD_LIMIT}
                         >
                           {card}
                         </button>
@@ -304,6 +305,11 @@ export default function Component() {
 
             <div className="mt-6">
               <h2 className="text-2xl font-semibold mb-4 text-darkGreen">Selected Cards:</h2>
+                {cards.length === SELECTED_CARD_LIMIT && (
+                  <p className="mb-4 text-yellow-600 font-medium">
+                    You can select up to {SELECTED_CARD_LIMIT} cards.
+                  </p>
+                )}
               <div className="flex flex-wrap gap-4">
                 {cards.map((card, index) => (
                   <div key={index} className="bg-neonGreen rounded-xl shadow-sm" style={{ width: '180px', aspectRatio: '1.586' }}>
