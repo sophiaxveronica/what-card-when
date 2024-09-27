@@ -56,7 +56,7 @@ export default function Component() {
     setName(e.target.value);
     setFormError('');
   };
-  
+
   // Helper for selecting card
   const addCard = (type: string) => {
     if (!cards.some(card => card.company === selectedCompany && card.type === type)) {
@@ -74,6 +74,7 @@ export default function Component() {
 
   // Main function
   const handleGenerateAndEmailResults = async () => {
+    // Only allow user to click generate results if they've inputted all the info we need
     if (!isFormValid(selectedCategories, cards, isValidEmail, name)) {
       setFormError(createFormErrorMessage(selectedCategories, cards, isValidEmail, name));
     } else {
@@ -81,21 +82,23 @@ export default function Component() {
       setErrorMessage('');
       setSuccessMessage('');
       try {
-        const timeoutDuration = 3000; // 3 second timeout
+        const timeoutDuration = 3000; // 3 second timeout, TODO: is this too short?
 
+        // First we calculate the recommendations and display them
         const data = await Promise.race([
           calculateRecommendations(cards, selectedCategories),
           timeoutPromise(timeoutDuration)
         ]);
         setResults(data);
         setShowResults(true);
-      
+
+        // Then we create and send the email 
         const htmlString = generateEmail(data, name, cards);
         await Promise.race([
           sendEmail(email, name, htmlString),
           timeoutPromise(timeoutDuration)
         ]);
-      
+
         setSuccessMessage("Great! We've sent your results. Check your email!");
       } catch (error) {
         // TODO: what's an easy way to get alerted about something like this?
@@ -112,10 +115,12 @@ export default function Component() {
           <h1 className="text-5xl font-bold mb-8 text-center gradient-text">
             What Card When?
           </h1>
+
+          {/* SPENDING CATEGORY CHECKBOX SECTION */}
           <div className="space-y-8">
             <div>
               <Label htmlFor="category-select" className="text-lg font-medium text-darkGreen">
-                Select Categories
+                Select categories
               </Label>
               <div className="grid grid-cols-2 gap-4 mt-2 border border-darkGreen rounded-lg p-4 bg-gray-50">
                 {categories.map((category) => (
@@ -142,9 +147,10 @@ export default function Component() {
               </div>
             </div>
 
+            {/* CREDIT CARD COMPANY DROPDOWN */}
             <div>
               <Label htmlFor="company-select" className="text-lg font-medium text-darkGreen">
-                Select Card Company
+                Select card company
               </Label>
               <div className="space-y-8">
                 <select
@@ -172,10 +178,10 @@ export default function Component() {
               </div>
             </div>
 
-
+            {/* CARD SELECTION FOR A SPECIFIC COMPANY */}
             {selectedCompany && (
               <div>
-                <h2 className="text-2xl font-semibold mb-4 text-darkGreen">Select Cards:</h2>
+                <h2 className="text-2xl font-semibold mb-4 text-darkGreen">Select cards:</h2>
                 <div className="flex flex-wrap gap-3">
                   {Array.isArray(cardOptions) ? (
                     cardOptions.map((card: string, index: number) => {
@@ -185,13 +191,12 @@ export default function Component() {
                         <button
                           key={index}
                           onClick={() => addCard(card)}
-                          className={`px-6 py-3 text-white rounded-full transform transition duration-200 shadow-md ${
-                            isCardSelected 
-                              ? 'bg-gray-700 cursor-not-allowed' // Dark gray for selected cards
-                              : isMaxCardsSelected
+                          className={`px-6 py-3 text-white rounded-full transform transition duration-200 shadow-md ${isCardSelected
+                            ? 'bg-gray-700 cursor-not-allowed' // Dark gray for selected cards
+                            : isMaxCardsSelected
                               ? 'bg-gray-400 cursor-not-allowed' // Light gray for max limit reached
                               : 'bg-neonGreen hover:bg-darkGreen hover:scale-105'
-                          }`}
+                            }`}
                           disabled={isCardSelected || isMaxCardsSelected}
                         >
                           {card}
@@ -205,19 +210,18 @@ export default function Component() {
               </div>
             )}
 
-            
-
+            {/* CURRENTLY SELECTED CARDS VIEW */}
             <div className="mt-6">
-              <h2 className="text-2xl font-semibold mb-4 text-darkGreen">Selected Cards:</h2>
-                {cards.length === SELECTED_CARD_LIMIT ? (
-                  <p className="mb-4 text-yellow-600 font-medium">
-                    You can select up to {SELECTED_CARD_LIMIT} cards.
-                  </p>
-                ) : cards.length === 0 ? (
-                  <p className="mb-4 text-gray-600 font-medium">
-                    No cards selected.
-                  </p>
-                ) : null}
+              <h2 className="text-2xl font-semibold mb-4 text-darkGreen">Selected cards:</h2>
+              {cards.length === SELECTED_CARD_LIMIT ? (
+                <p className="mb-4 text-yellow-600 font-medium">
+                  You can select up to {SELECTED_CARD_LIMIT} cards.
+                </p>
+              ) : cards.length === 0 ? (
+                <p className="mb-4 text-gray-600 font-medium">
+                  No cards selected.
+                </p>
+              ) : null}
               <div className="flex flex-wrap gap-4">
                 {cards.map((card, index) => (
                   <div key={index} className="bg-neonGreen rounded-xl shadow-sm" style={{ width: '180px', aspectRatio: '1.586' }}>
@@ -237,9 +241,9 @@ export default function Component() {
                 ))}
               </div>
             </div>
-
-
           </div>
+
+          {/* FORM INPUTS FOR THE EMAIL */}
           <div className="mt-6 space-y-4">
             <div>
               <Label htmlFor="name-input" className="text-lg font-medium text-darkGreen">
@@ -272,13 +276,15 @@ export default function Component() {
               )}
             </div>
           </div>
+
+          {/* GENERATE RECOMMENDATIONS BUTTON */}
           <div className="mt-8">
             <button
               // TODO: should we disable the button once it's been clicked until the user changes 
               // something, like adds a card, unchecks a category, or changes their email? 
               onClick={handleGenerateAndEmailResults}
               className={`w-full py-4 rounded-full text-xl font-bold shadow-lg transform transition duration-200 
-            ${isFormValid(selectedCategories,cards,isValidEmail,name)
+            ${isFormValid(selectedCategories, cards, isValidEmail, name)
                   ? 'bg-darkGreen hover:bg-neonGreen text-white hover:scale-105'
                   : 'bg-gray-400 text-gray-600 cursor-not-allowed'}`}
             >
@@ -290,17 +296,19 @@ export default function Component() {
               </p>
             )}
             {errorMessage && (
-            <p className="mt-2 text-red-500 text-center">
-              {errorMessage}
-            </p>
+              <p className="mt-2 text-red-500 text-center">
+                {errorMessage}
+              </p>
             )}
             {successMessage && (
-            <p className="mt-2 text-green-500 text-center">
-              {successMessage}
-            </p>
+              <p className="mt-2 text-green-500 text-center">
+                {successMessage}
+              </p>
             )}
           </div>
         </div>
+
+        {/* RECOMMENDATIONS VIEW */}
         {showResults && (
           <div className="bg-white p-8 rounded-t-3xl mt-8 ">
             <h2 className="text-3xl font-bold mb-6 text-darkGreen">Your Optimal Card Usage:</h2>
