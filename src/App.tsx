@@ -292,22 +292,30 @@ export default function Component() {
                 </div>
               </div>
             )}
+
             <div className="mt-6">
               <h2 className="text-2xl font-semibold mb-4 text-darkGreen">Selected Cards:</h2>
-              <div className="space-y-3">
+              <div className="flex flex-wrap gap-4">
                 {cards.map((card, index) => (
-                  <div key={index} className="flex items-center justify-between bg-neonGreen p-4 rounded-xl shadow-sm">
-                    <span className="text-lg text-darkGreen font-medium">{`${card.company} - ${card.type}`}</span>
-                    <button
-                      onClick={() => removeCard(index)}
-                      className="text-darkGreen hover:text-neonGreen transform hover:scale-110 transition duration-200"
-                    >
-                      <Trash2 className="h-6 w-6" />
-                    </button>
+                  <div key={index} className="bg-neonGreen rounded-xl shadow-sm" style={{ width: '180px', aspectRatio: '1.586' }}>
+                    <div className="h-full p-4 flex flex-col justify-between">
+                      <div className="flex-grow flex flex-col items-center justify-center text-center">
+                        <p className="text-lg text-darkGreen font-medium">{card.company}</p>
+                        <p className="text-md text-darkGreen">{card.type}</p>
+                      </div>
+                      <button
+                        onClick={() => removeCard(index)}
+                        className="self-end text-darkGreen hover:text-white transform hover:scale-110 transition duration-200"
+                      >
+                        <Trash2 className="h-6 w-6" />
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
             </div>
+
+
           </div>
           <div className="mt-6 space-y-4">
             <div>
