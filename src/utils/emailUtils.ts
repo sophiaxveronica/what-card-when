@@ -15,12 +15,12 @@ export function generateResultsEmail(results: SpendingCategory[], name: string, 
         </tr>
         <tr>
           <td style="padding: 0 0 20px 0;">
-            <p style="color: #006400; font-size: 18px; margin: 0;">Thanks for using WhatCardWhen.</p>
+            <p style="color: #006400; font-size: 18px; margin: 0;">Thanks for using What Card When.</p>
           </td>
         </tr>
         <tr>
           <td style="padding: 0 0 20px 0;">
-            <p style="color: #006400; font-size: 18px; margin: 0;">Here's what we recommend for you given these inputted cards:<br>${cardList}.</p>
+            <p style="color: #006400; font-size: 18px; margin: 0;">Here's what we recommend given your cards:<br>${cardList}.</p>
           </td>
         </tr>
       </table>      

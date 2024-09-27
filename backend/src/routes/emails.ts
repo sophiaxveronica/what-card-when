@@ -11,7 +11,7 @@ router.post('/send', async (req, res) => {
     const { to, subject, html } = req.body;
 
     const result = await resend.emails.send({
-      from: 'WCW Team <hi@whatcardwhen.com>',
+      from: 'What Card When Team <hi@whatcardwhen.com>',
       replyTo: 'hi@whatcardwhen.com',
       to,
       subject,
