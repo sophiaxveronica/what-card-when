@@ -11,7 +11,7 @@ router.post('/send', async (req, res) => {
     const { to, subject, html } = req.body;
 
     const result = await resend.emails.send({
-      from: 'WCW Team <hi@whatcardwhen.com>',
+      from: 'What Card When Team <hi@whatcardwhen.com>',
       replyTo: 'hi@whatcardwhen.com',
       to,
       subject,
@@ -27,10 +27,11 @@ router.post('/send', async (req, res) => {
 });
 
 // Add user to contact list
-// Unfortunately we can't add custom data, 
-// so we have no way to pass the cards list here
+// TODO: I think I never got this to work, not sure we need it
 router.post('/add-contact', async (req, res) => {
   try {
+    console.log("in the email");
+    // Unfortunately we can't add custom data like the cards list here
     const { name, email } = req.body;
 
     const result = await resend.contacts.create({

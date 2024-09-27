@@ -3,17 +3,15 @@ import { Trash2 } from 'lucide-react';
 import { Label } from '@radix-ui/react-label';
 import React from 'react';
 import './index.css';
+import { capitalizeWords } from './utils/stringUtils';
+import { validateEmail, isFormValid, createFormErrorMessage } from './utils/validationUtils';
+import { generateEmail } from './utils/emailUtils';
+import { fetchCardCompanies, fetchCardOptions, calculateRecommendations, sendEmail } from './utils/apiUtils';
+import { SpendingCategory, Card } from './types';
+
+const timeoutPromise = (ms: number) => new Promise((_, reject) => setTimeout(() => reject(new Error('Request timed out')), ms));
 
 const SELECTED_CARD_LIMIT = 6;
-
-type SpendingCategory = {
-  category: string;
-  bestCard: {
-    company: string;
-    type: string;
-    percentage: number;
-  } | null;
-};
 
 const categories = [
   'dining',
@@ -25,13 +23,6 @@ const categories = [
   'hotels',
   'flights'
 ];
-
-const capitalizeWords = (str: string) => {
-  return str
-    .split(' ')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
-};
 
 export default function Component() {
   const [cards, setCards] = useState<{ company: string; type: string }[]>([]);
@@ -45,105 +36,28 @@ export default function Component() {
   const [isValidEmail, setIsValidEmail] = useState(false);
   const [name, setName] = useState('');
   const [formError, setFormError] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
-  const validateEmail = (email: string) => {
-    const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    return re.test(email);
-  };
+  useEffect(() => {
+    fetchCardCompanies().then(setCardCompanies);
+  }, []);
 
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Form validation for email field
+  const handleEmailInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newEmail = e.target.value;
     setEmail(newEmail);
     setIsValidEmail(validateEmail(newEmail));
     setFormError('');
   };
 
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Form validation for name field
+  const handleNameInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setName(e.target.value);
     setFormError('');
   };
-
-  const isFormValid = () => {
-    return (
-      selectedCategories.length > 0 &&
-      cards.length > 0 &&
-      isValidEmail &&
-      name.trim() !== ''
-    );
-  };
-
-  function generateResultsEmail(results: SpendingCategory[], name: string, cards: { company: string; type: string }[]): string {
-    const cardList = cards.map(card => `${card.company} ${card.type}`).join(', ');
-
-    return `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f0f8f0;">
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f0f8f0;">
-      <table cellpadding="0" cellspacing="0" border="0" width="100%">
-        <tr>
-          <td style="padding: 0 0 20px 0;">
-            <p style="color: #006400; font-size: 18px; margin: 0;">Hi ${name}!</p>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding: 0 0 20px 0;">
-            <p style="color: #006400; font-size: 18px; margin: 0;">Thanks for using WhatCardWhen.</p>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding: 0 0 20px 0;">
-            <p style="color: #006400; font-size: 18px; margin: 0;">Here's what we recommend for you given these inputted cards:<br>${cardList}.</p>
-          </td>
-        </tr>
-      </table>      
-      <h2 style="color: #006400; font-size: 24px; margin-bottom: 20px;">Your Optimal Card Usage:</h2>
-      ${results.map((category, index) => `
-        <div style="background-color: #ffffff; border: 2px solid #006400; border-radius: 10px; padding: 15px; margin-bottom: 15px;">
-          <h3 style="color: #00ff00; font-size: 18px; margin-top: 0; margin-bottom: 10px;">${capitalizeWords(category.category)}</h3>
-          ${category.bestCard
-        ? `
-              <p style="color: #006400; margin: 5px 0;">Best Card: <strong>${category.bestCard.company} - ${category.bestCard.type}</strong></p>
-              <p style="color: #006400; margin: 5px 0;">Cashback: <strong>${category.bestCard.percentage}%</strong></p>
-            `
-        : `<p style="color: #ff0000; margin: 5px 0;">No card available for this category</p>`
-      }
-        </div>
-      `).join('')}
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f0f8f0;">
-      <table cellpadding="0" cellspacing="0" border="0" width="100%">
-        <tr>
-          <td style="padding: 0 0 20px 0;">
-            <p style="color: #006400; font-size: 18px; margin: 0;">We're actively building WhatCardWhen.</p>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding: 0 0 20px 0;">
-            <p style="color: #006400; font-size: 18px; margin: 0;">Let us know what you think!</p>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding: 0 0 20px 0;">
-            <p style="color: #006400; font-size: 18px; margin: 0;">Best,<br>the WCW team</p>
-          </td>
-        </tr>
-      </table>
-    </div>
-  `;
-  }
-
-  useEffect(() => {
-    const fetchCardCompanies = async () => {
-      try {
-        const response = await fetch('http://localhost:5001/api/cards/companies');
-        const data = await response.json();
-        setCardCompanies(data);
-      } catch (error) {
-        console.error('Error fetching card companies:', error);
-      }
-    };
-
-    fetchCardCompanies();
-  }, []);
-
+  
+  // Helper for selecting card
   const addCard = (type: string) => {
     if (!cards.some(card => card.company === selectedCompany && card.type === type)) {
       setCards([...cards, { company: selectedCompany, type }]);
@@ -151,57 +65,43 @@ export default function Component() {
     setFormError('');
   };
 
+  // Helper for removing card
   const removeCard = (index: number) => {
     const newCards = cards.filter((_, i) => i !== index);
     setCards(newCards);
     setFormError('');
   };
 
-  const handleGenerateResults = () => {
-    if (!isFormValid()) {
-      let errorMessage = '';
-      if (selectedCategories.length === 0) errorMessage += 'Please select at least one category. ';
-      if (cards.length === 0) errorMessage += 'Please add at least one card. ';
-      if (!isValidEmail) errorMessage += 'Please enter a valid email address. ';
-      if (name.trim() === '') errorMessage += 'Please fill in your name. ';
-      setFormError(errorMessage.trim());
+  // Main function
+  const handleGenerateAndEmailResults = async () => {
+    if (!isFormValid(selectedCategories, cards, isValidEmail, name)) {
+      setFormError(createFormErrorMessage(selectedCategories, cards, isValidEmail, name));
     } else {
       setFormError('');
-      generateResults();
-    }
-  };
+      setErrorMessage('');
+      setSuccessMessage('');
+      try {
+        const timeoutDuration = 3000; // 3 second timeout
 
-  const generateResults = async () => {
-    try {
-      const response = await fetch('http://localhost:5001/api/cards/filter', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ cards, categories: selectedCategories }),
-      });
-      const data = await response.json();
-      setResults(data);
-      setShowResults(true);
-
-      const htmlString = generateResultsEmail(data, name, cards);
-      console.log(htmlString);
-      // Call the new endpoint to trigger email sending
-      const emailResponse = await fetch('http://localhost:5001/api/emails/send', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ to: email, name: name, subject: 'Recommendations for What Card When?', html: htmlString }),
-      });
-
-      if (!emailResponse.ok) {
-        throw new Error('Failed to send results email');
+        const data = await Promise.race([
+          calculateRecommendations(cards, selectedCategories),
+          timeoutPromise(timeoutDuration)
+        ]);
+        setResults(data);
+        setShowResults(true);
+      
+        const htmlString = generateEmail(data, name, cards);
+        await Promise.race([
+          sendEmail(email, name, htmlString),
+          timeoutPromise(timeoutDuration)
+        ]);
+      
+        setSuccessMessage("Great! We've sent your results. Check your email!");
+      } catch (error) {
+        // TODO: what's an easy way to get alerted about something like this?
+        console.error('Error generating or sending results:', error);
+        setErrorMessage("Hmm, something went wrong, sorry about that!");
       }
-      console.log('Results email sent successfully');
-
-    } catch (error) {
-      console.error('Error fetching results:', error);
     }
   };
 
@@ -254,8 +154,7 @@ export default function Component() {
                     const company = e.target.value;
                     setSelectedCompany(company);
                     try {
-                      const response = await fetch(`http://localhost:5001/api/cards/options/${company}`);
-                      const data = await response.json();
+                      const data = await fetchCardOptions(company);
                       setCardOptions(data);
                     } catch (error) {
                       console.error('Error fetching card options:', error);
@@ -310,11 +209,15 @@ export default function Component() {
 
             <div className="mt-6">
               <h2 className="text-2xl font-semibold mb-4 text-darkGreen">Selected Cards:</h2>
-                {cards.length === SELECTED_CARD_LIMIT && (
+                {cards.length === SELECTED_CARD_LIMIT ? (
                   <p className="mb-4 text-yellow-600 font-medium">
                     You can select up to {SELECTED_CARD_LIMIT} cards.
                   </p>
-                )}
+                ) : cards.length === 0 ? (
+                  <p className="mb-4 text-gray-600 font-medium">
+                    No cards selected.
+                  </p>
+                ) : null}
               <div className="flex flex-wrap gap-4">
                 {cards.map((card, index) => (
                   <div key={index} className="bg-neonGreen rounded-xl shadow-sm" style={{ width: '180px', aspectRatio: '1.586' }}>
@@ -346,7 +249,7 @@ export default function Component() {
                 id="name-input"
                 type="text"
                 value={name}
-                onChange={handleNameChange}
+                onChange={handleNameInputChange}
                 className="mt-2 block w-full p-3 border-2 border-darkGreen rounded-xl focus:ring focus:ring-neonGreen transition duration-200"
                 placeholder="Your Name"
               />
@@ -359,7 +262,7 @@ export default function Component() {
                 id="email-input"
                 type="email"
                 value={email}
-                onChange={handleEmailChange}
+                onChange={handleEmailInputChange}
                 className={`mt-2 block w-full p-3 border-2 ${isValidEmail ? 'border-neonGreen' : 'border-darkGreen'
                   } rounded-xl focus:ring focus:ring-neonGreen transition duration-200`}
                 placeholder="your@email.com"
@@ -371,18 +274,30 @@ export default function Component() {
           </div>
           <div className="mt-8">
             <button
-              onClick={handleGenerateResults}
+              // TODO: should we disable the button once it's been clicked until the user changes 
+              // something, like adds a card, unchecks a category, or changes their email? 
+              onClick={handleGenerateAndEmailResults}
               className={`w-full py-4 rounded-full text-xl font-bold shadow-lg transform transition duration-200 
-            ${isFormValid()
+            ${isFormValid(selectedCategories,cards,isValidEmail,name)
                   ? 'bg-darkGreen hover:bg-neonGreen text-white hover:scale-105'
                   : 'bg-gray-400 text-gray-600 cursor-not-allowed'}`}
             >
-              Generate and Email Results
+              Get your results!
             </button>
             {formError && (
               <p className="mt-2 text-red-500 text-center">
                 {formError}
               </p>
+            )}
+            {errorMessage && (
+            <p className="mt-2 text-red-500 text-center">
+              {errorMessage}
+            </p>
+            )}
+            {successMessage && (
+            <p className="mt-2 text-green-500 text-center">
+              {successMessage}
+            </p>
             )}
           </div>
         </div>
