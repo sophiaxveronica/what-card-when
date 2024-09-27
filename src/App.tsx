@@ -4,6 +4,8 @@ import { Label } from '@radix-ui/react-label';
 import React from 'react';
 import './index.css';
 
+const SELECTED_CARD_LIMIT = 6;
+
 type SpendingCategory = {
   category: string;
   bestCard: {
@@ -43,7 +45,6 @@ export default function Component() {
   const [isValidEmail, setIsValidEmail] = useState(false);
   const [name, setName] = useState('');
   const [formError, setFormError] = useState('');
-
 
   const validateEmail = (email: string) => {
     const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -144,7 +145,7 @@ export default function Component() {
   }, []);
 
   const addCard = (type: string) => {
-    if (cards.length < 6) {
+    if (!cards.some(card => card.company === selectedCompany && card.type === type)) {
       setCards([...cards, { company: selectedCompany, type }]);
     }
     setFormError('');
@@ -271,43 +272,70 @@ export default function Component() {
                 </select>
               </div>
             </div>
+
+
             {selectedCompany && (
               <div>
                 <h2 className="text-2xl font-semibold mb-4 text-darkGreen">Select Cards:</h2>
                 <div className="flex flex-wrap gap-3">
                   {Array.isArray(cardOptions) ? (
-                    cardOptions.map((card: string, index: number) => (
-                      <button
-                        key={index}
-                        onClick={() => addCard(card)}
-                        className={`px-6 py-3 ${cards.some(c => c.type === card) ? 'bg-darkGreen' : 'bg-neonGreen'} text-white rounded-full hover:bg-darkGreen transform hover:scale-105 transition duration-200 shadow-md`}
-                        disabled={cards.length >= 6}
-                      >
-                        {card}
-                      </button>
-                    ))
+                    cardOptions.map((card: string, index: number) => {
+                      const isCardSelected = cards.some(c => c.company === selectedCompany && c.type === card);
+                      const isMaxCardsSelected = cards.length >= SELECTED_CARD_LIMIT;
+                      return (
+                        <button
+                          key={index}
+                          onClick={() => addCard(card)}
+                          className={`px-6 py-3 text-white rounded-full transform transition duration-200 shadow-md ${
+                            isCardSelected 
+                              ? 'bg-gray-700 cursor-not-allowed' // Dark gray for selected cards
+                              : isMaxCardsSelected
+                              ? 'bg-gray-400 cursor-not-allowed' // Light gray for max limit reached
+                              : 'bg-neonGreen hover:bg-darkGreen hover:scale-105'
+                          }`}
+                          disabled={isCardSelected || isMaxCardsSelected}
+                        >
+                          {card}
+                        </button>
+                      );
+                    })
                   ) : (
                     <p>No card options available</p>
                   )}
                 </div>
               </div>
             )}
+
+            
+
             <div className="mt-6">
               <h2 className="text-2xl font-semibold mb-4 text-darkGreen">Selected Cards:</h2>
-              <div className="space-y-3">
+                {cards.length === SELECTED_CARD_LIMIT && (
+                  <p className="mb-4 text-yellow-600 font-medium">
+                    You can select up to {SELECTED_CARD_LIMIT} cards.
+                  </p>
+                )}
+              <div className="flex flex-wrap gap-4">
                 {cards.map((card, index) => (
-                  <div key={index} className="flex items-center justify-between bg-neonGreen p-4 rounded-xl shadow-sm">
-                    <span className="text-lg text-darkGreen font-medium">{`${card.company} - ${card.type}`}</span>
-                    <button
-                      onClick={() => removeCard(index)}
-                      className="text-darkGreen hover:text-neonGreen transform hover:scale-110 transition duration-200"
-                    >
-                      <Trash2 className="h-6 w-6" />
-                    </button>
+                  <div key={index} className="bg-neonGreen rounded-xl shadow-sm" style={{ width: '180px', aspectRatio: '1.586' }}>
+                    <div className="h-full p-4 flex flex-col justify-between">
+                      <div className="flex-grow flex flex-col items-center justify-center text-center">
+                        <p className="text-lg text-darkGreen font-medium">{card.company}</p>
+                        <p className="text-md text-darkGreen">{card.type}</p>
+                      </div>
+                      <button
+                        onClick={() => removeCard(index)}
+                        className="self-end text-darkGreen hover:text-white transform hover:scale-110 transition duration-200"
+                      >
+                        <Trash2 className="h-6 w-6" />
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
             </div>
+
+
           </div>
           <div className="mt-6 space-y-4">
             <div>
