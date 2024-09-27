@@ -282,7 +282,7 @@ export default function Component() {
                   ? 'bg-darkGreen hover:bg-neonGreen text-white hover:scale-105'
                   : 'bg-gray-400 text-gray-600 cursor-not-allowed'}`}
             >
-              Generate and email Results
+              Get your results!
             </button>
             {formError && (
               <p className="mt-2 text-red-500 text-center">

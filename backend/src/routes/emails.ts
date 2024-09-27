@@ -27,6 +27,7 @@ router.post('/send', async (req, res) => {
 });
 
 // Add user to contact list
+// TODO: I think I never got this to work, not sure we need it
 router.post('/add-contact', async (req, res) => {
   try {
     console.log("in the email");
