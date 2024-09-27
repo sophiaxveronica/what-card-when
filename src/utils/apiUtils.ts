@@ -20,7 +20,7 @@ export const fetchCardOptions = async (company: string) => {
   }
 };
 
-export const generateResults = async (cards: any[], selectedCategories: string[]) => {
+export const calculateRecommendations = async (cards: any[], selectedCategories: string[]) => {
   try {
     const response = await fetch(`${API_BASE_URL}/cards/filter`, {
       method: 'POST',
@@ -36,7 +36,7 @@ export const generateResults = async (cards: any[], selectedCategories: string[]
   }
 };
 
-export const sendResultsEmail = async (email: string, name: string, htmlContent: string) => {
+export const sendEmail = async (email: string, name: string, htmlContent: string) => {
   try {
     const response = await fetch(`${API_BASE_URL}/emails/send`, {
       method: 'POST',

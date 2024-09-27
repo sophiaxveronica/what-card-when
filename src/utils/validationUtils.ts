@@ -11,3 +11,13 @@ export const validateEmail = (email: string) => {
       name.trim() !== ''
     );
   };
+
+  export const createFormErrorMessage = (selectedCategories: string[], cards: any[], isValidEmail: boolean, name: string): string => {
+    let errorMessage = '';
+    if (selectedCategories.length === 0) errorMessage += 'Please select at least one category. ';
+    if (cards.length === 0) errorMessage += 'Please add at least one card. ';
+    if (!isValidEmail) errorMessage += 'Please enter a valid email address. ';
+    if (name.trim() === '') errorMessage += 'Please fill in your name. ';
+    return errorMessage.trim();
+  }
+  

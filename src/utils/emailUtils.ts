@@ -2,7 +2,7 @@ import { SpendingCategory } from '../types';
 import { capitalizeWords } from './stringUtils';
 
 // This is the email that we send users when they use What Card When to generate results
-export function generateResultsEmail(results: SpendingCategory[], name: string, cards: { company: string; type: string }[]): string {
+export function generateEmail(results: SpendingCategory[], name: string, cards: { company: string; type: string }[]): string {
     const cardList = cards.map(card => `${card.company} ${card.type}`).join(', ');
 
     return `

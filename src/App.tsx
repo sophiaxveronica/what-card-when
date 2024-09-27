@@ -4,9 +4,9 @@ import { Label } from '@radix-ui/react-label';
 import React from 'react';
 import './index.css';
 import { capitalizeWords } from './utils/stringUtils';
-import { validateEmail, isFormValid } from './utils/validationUtils';
-import { generateResultsEmail } from './utils/emailUtils';
-import { fetchCardCompanies, fetchCardOptions, generateResults, sendResultsEmail } from './utils/apiUtils';
+import { validateEmail, isFormValid, createFormErrorMessage } from './utils/validationUtils';
+import { generateEmail } from './utils/emailUtils';
+import { fetchCardCompanies, fetchCardOptions, calculateRecommendations, sendEmail } from './utils/apiUtils';
 import { SpendingCategory, Card } from './types';
 
 const timeoutPromise = (ms: number) => new Promise((_, reject) => setTimeout(() => reject(new Error('Request timed out')), ms));
@@ -43,16 +43,16 @@ export default function Component() {
     fetchCardCompanies().then(setCardCompanies);
   }, []);
 
-  // Form validation
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Form validation for email field
+  const handleEmailInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newEmail = e.target.value;
     setEmail(newEmail);
     setIsValidEmail(validateEmail(newEmail));
     setFormError('');
   };
 
-  // Form validation
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Form validation for name field
+  const handleNameInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setName(e.target.value);
     setFormError('');
   };
@@ -73,14 +73,9 @@ export default function Component() {
   };
 
   // Main function
-  const handleGenerateResults = async () => {
+  const handleGenerateAndEmailResults = async () => {
     if (!isFormValid(selectedCategories, cards, isValidEmail, name)) {
-      let errorMessage = '';
-      if (selectedCategories.length === 0) errorMessage += 'Please select at least one category. ';
-      if (cards.length === 0) errorMessage += 'Please add at least one card. ';
-      if (!isValidEmail) errorMessage += 'Please enter a valid email address. ';
-      if (name.trim() === '') errorMessage += 'Please fill in your name. ';
-      setFormError(errorMessage.trim());
+      setFormError(createFormErrorMessage(selectedCategories, cards, isValidEmail, name));
     } else {
       setFormError('');
       setErrorMessage('');
@@ -89,15 +84,15 @@ export default function Component() {
         const timeoutDuration = 3000; // 3 second timeout
 
         const data = await Promise.race([
-          generateResults(cards, selectedCategories),
+          calculateRecommendations(cards, selectedCategories),
           timeoutPromise(timeoutDuration)
         ]);
         setResults(data);
         setShowResults(true);
       
-        const htmlString = generateResultsEmail(data, name, cards);
+        const htmlString = generateEmail(data, name, cards);
         await Promise.race([
-          sendResultsEmail(email, name, htmlString),
+          sendEmail(email, name, htmlString),
           timeoutPromise(timeoutDuration)
         ]);
       
@@ -254,7 +249,7 @@ export default function Component() {
                 id="name-input"
                 type="text"
                 value={name}
-                onChange={handleNameChange}
+                onChange={handleNameInputChange}
                 className="mt-2 block w-full p-3 border-2 border-darkGreen rounded-xl focus:ring focus:ring-neonGreen transition duration-200"
                 placeholder="Your Name"
               />
@@ -267,7 +262,7 @@ export default function Component() {
                 id="email-input"
                 type="email"
                 value={email}
-                onChange={handleEmailChange}
+                onChange={handleEmailInputChange}
                 className={`mt-2 block w-full p-3 border-2 ${isValidEmail ? 'border-neonGreen' : 'border-darkGreen'
                   } rounded-xl focus:ring focus:ring-neonGreen transition duration-200`}
                 placeholder="your@email.com"
@@ -281,13 +276,13 @@ export default function Component() {
             <button
               // TODO: should we disable the button once it's been clicked until the user changes 
               // something, like adds a card, unchecks a category, or changes their email? 
-              onClick={handleGenerateResults}
+              onClick={handleGenerateAndEmailResults}
               className={`w-full py-4 rounded-full text-xl font-bold shadow-lg transform transition duration-200 
             ${isFormValid(selectedCategories,cards,isValidEmail,name)
                   ? 'bg-darkGreen hover:bg-neonGreen text-white hover:scale-105'
                   : 'bg-gray-400 text-gray-600 cursor-not-allowed'}`}
             >
-              Generate and Email Results
+              Generate and email Results
             </button>
             {formError && (
               <p className="mt-2 text-red-500 text-center">
