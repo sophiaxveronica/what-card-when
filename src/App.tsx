@@ -191,14 +191,14 @@ export default function Component() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ to: email, name: name, subject: 'HI THERE', html: htmlString }),
+        body: JSON.stringify({ to: email, name: name, subject: 'Recommendations for What Card When?', html: htmlString }),
       });
 
       if (!emailResponse.ok) {
         throw new Error('Failed to send results email');
       }
-
       console.log('Results email sent successfully');
+
     } catch (error) {
       console.error('Error fetching results:', error);
     }
