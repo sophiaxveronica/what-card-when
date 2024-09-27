@@ -3,17 +3,13 @@ import { Trash2 } from 'lucide-react';
 import { Label } from '@radix-ui/react-label';
 import React from 'react';
 import './index.css';
+import { capitalizeWords } from './utils/stringUtils';
+import { validateEmail, isFormValid } from './utils/validationUtils';
+import { generateResultsEmail } from './utils/emailUtils';
+import { fetchCardCompanies, fetchCardOptions, generateResults, sendResultsEmail } from './utils/apiUtils';
+import { SpendingCategory, Card } from './types';
 
 const SELECTED_CARD_LIMIT = 6;
-
-type SpendingCategory = {
-  category: string;
-  bestCard: {
-    company: string;
-    type: string;
-    percentage: number;
-  } | null;
-};
 
 const categories = [
   'dining',
@@ -25,13 +21,6 @@ const categories = [
   'hotels',
   'flights'
 ];
-
-const capitalizeWords = (str: string) => {
-  return str
-    .split(' ')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
-};
 
 export default function Component() {
   const [cards, setCards] = useState<{ company: string; type: string }[]>([]);
@@ -46,11 +35,11 @@ export default function Component() {
   const [name, setName] = useState('');
   const [formError, setFormError] = useState('');
 
-  const validateEmail = (email: string) => {
-    const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    return re.test(email);
-  };
+  useEffect(() => {
+    fetchCardCompanies().then(setCardCompanies);
+  }, []);
 
+  // Form validation
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newEmail = e.target.value;
     setEmail(newEmail);
@@ -58,92 +47,13 @@ export default function Component() {
     setFormError('');
   };
 
+  // Form validation
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setName(e.target.value);
     setFormError('');
   };
-
-  const isFormValid = () => {
-    return (
-      selectedCategories.length > 0 &&
-      cards.length > 0 &&
-      isValidEmail &&
-      name.trim() !== ''
-    );
-  };
-
-  function generateResultsEmail(results: SpendingCategory[], name: string, cards: { company: string; type: string }[]): string {
-    const cardList = cards.map(card => `${card.company} ${card.type}`).join(', ');
-
-    return `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f0f8f0;">
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f0f8f0;">
-      <table cellpadding="0" cellspacing="0" border="0" width="100%">
-        <tr>
-          <td style="padding: 0 0 20px 0;">
-            <p style="color: #006400; font-size: 18px; margin: 0;">Hi ${name}!</p>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding: 0 0 20px 0;">
-            <p style="color: #006400; font-size: 18px; margin: 0;">Thanks for using WhatCardWhen.</p>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding: 0 0 20px 0;">
-            <p style="color: #006400; font-size: 18px; margin: 0;">Here's what we recommend for you given these inputted cards:<br>${cardList}.</p>
-          </td>
-        </tr>
-      </table>      
-      <h2 style="color: #006400; font-size: 24px; margin-bottom: 20px;">Your Optimal Card Usage:</h2>
-      ${results.map((category, index) => `
-        <div style="background-color: #ffffff; border: 2px solid #006400; border-radius: 10px; padding: 15px; margin-bottom: 15px;">
-          <h3 style="color: #00ff00; font-size: 18px; margin-top: 0; margin-bottom: 10px;">${capitalizeWords(category.category)}</h3>
-          ${category.bestCard
-        ? `
-              <p style="color: #006400; margin: 5px 0;">Best Card: <strong>${category.bestCard.company} - ${category.bestCard.type}</strong></p>
-              <p style="color: #006400; margin: 5px 0;">Cashback: <strong>${category.bestCard.percentage}%</strong></p>
-            `
-        : `<p style="color: #ff0000; margin: 5px 0;">No card available for this category</p>`
-      }
-        </div>
-      `).join('')}
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f0f8f0;">
-      <table cellpadding="0" cellspacing="0" border="0" width="100%">
-        <tr>
-          <td style="padding: 0 0 20px 0;">
-            <p style="color: #006400; font-size: 18px; margin: 0;">We're actively building WhatCardWhen.</p>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding: 0 0 20px 0;">
-            <p style="color: #006400; font-size: 18px; margin: 0;">Let us know what you think!</p>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding: 0 0 20px 0;">
-            <p style="color: #006400; font-size: 18px; margin: 0;">Best,<br>the WCW team</p>
-          </td>
-        </tr>
-      </table>
-    </div>
-  `;
-  }
-
-  useEffect(() => {
-    const fetchCardCompanies = async () => {
-      try {
-        const response = await fetch('http://localhost:5001/api/cards/companies');
-        const data = await response.json();
-        setCardCompanies(data);
-      } catch (error) {
-        console.error('Error fetching card companies:', error);
-      }
-    };
-
-    fetchCardCompanies();
-  }, []);
-
+  
+  // Helper for selecting card
   const addCard = (type: string) => {
     if (!cards.some(card => card.company === selectedCompany && card.type === type)) {
       setCards([...cards, { company: selectedCompany, type }]);
@@ -151,14 +61,16 @@ export default function Component() {
     setFormError('');
   };
 
+  // Helper for removing card
   const removeCard = (index: number) => {
     const newCards = cards.filter((_, i) => i !== index);
     setCards(newCards);
     setFormError('');
   };
 
-  const handleGenerateResults = () => {
-    if (!isFormValid()) {
+  // Main function
+  const handleGenerateResults = async () => {
+    if (!isFormValid(selectedCategories, cards, isValidEmail, name)) {
       let errorMessage = '';
       if (selectedCategories.length === 0) errorMessage += 'Please select at least one category. ';
       if (cards.length === 0) errorMessage += 'Please add at least one card. ';
@@ -167,41 +79,16 @@ export default function Component() {
       setFormError(errorMessage.trim());
     } else {
       setFormError('');
-      generateResults();
-    }
-  };
-
-  const generateResults = async () => {
-    try {
-      const response = await fetch('http://localhost:5001/api/cards/filter', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ cards, categories: selectedCategories }),
-      });
-      const data = await response.json();
-      setResults(data);
-      setShowResults(true);
-
-      const htmlString = generateResultsEmail(data, name, cards);
-      console.log(htmlString);
-      // Call the new endpoint to trigger email sending
-      const emailResponse = await fetch('http://localhost:5001/api/emails/send', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ to: email, name: name, subject: 'Recommendations for What Card When?', html: htmlString }),
-      });
-
-      if (!emailResponse.ok) {
-        throw new Error('Failed to send results email');
+      try {
+        const data = await generateResults(cards, selectedCategories);
+        setResults(data);
+        setShowResults(true);
+  
+        const htmlString = generateResultsEmail(data, name, cards);
+        await sendResultsEmail(email, name, htmlString);
+      } catch (error) {
+        console.error('Error generating or sending results:', error);
       }
-      console.log('Results email sent successfully');
-
-    } catch (error) {
-      console.error('Error fetching results:', error);
     }
   };
 
@@ -254,8 +141,7 @@ export default function Component() {
                     const company = e.target.value;
                     setSelectedCompany(company);
                     try {
-                      const response = await fetch(`http://localhost:5001/api/cards/options/${company}`);
-                      const data = await response.json();
+                      const data = await fetchCardOptions(company);
                       setCardOptions(data);
                     } catch (error) {
                       console.error('Error fetching card options:', error);
@@ -373,7 +259,7 @@ export default function Component() {
             <button
               onClick={handleGenerateResults}
               className={`w-full py-4 rounded-full text-xl font-bold shadow-lg transform transition duration-200 
-            ${isFormValid()
+            ${isFormValid(selectedCategories,cards,isValidEmail,name)
                   ? 'bg-darkGreen hover:bg-neonGreen text-white hover:scale-105'
                   : 'bg-gray-400 text-gray-600 cursor-not-allowed'}`}
             >
