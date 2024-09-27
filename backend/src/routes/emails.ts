@@ -29,6 +29,7 @@ router.post('/send', async (req, res) => {
 // Add user to contact list
 router.post('/add-contact', async (req, res) => {
   try {
+    console.log("in the email");
     // Unfortunately we can't add custom data like the cards list here
     const { name, email } = req.body;
 

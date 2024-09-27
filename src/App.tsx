@@ -37,6 +37,7 @@ export default function Component() {
   const [name, setName] = useState('');
   const [formError, setFormError] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
   useEffect(() => {
     fetchCardCompanies().then(setCardCompanies);
@@ -83,20 +84,24 @@ export default function Component() {
     } else {
       setFormError('');
       setErrorMessage('');
+      setSuccessMessage('');
       try {
         const timeoutDuration = 3000; // 3 second timeout
+
         const data = await Promise.race([
           generateResults(cards, selectedCategories),
           timeoutPromise(timeoutDuration)
         ]);
         setResults(data);
         setShowResults(true);
-  
+      
         const htmlString = generateResultsEmail(data, name, cards);
         await Promise.race([
           sendResultsEmail(email, name, htmlString),
           timeoutPromise(timeoutDuration)
         ]);
+      
+        setSuccessMessage("Great! We've sent your results. Check your email!");
       } catch (error) {
         // TODO: what's an easy way to get alerted about something like this?
         console.error('Error generating or sending results:', error);
@@ -292,6 +297,11 @@ export default function Component() {
             {errorMessage && (
             <p className="mt-2 text-red-500 text-center">
               {errorMessage}
+            </p>
+            )}
+            {successMessage && (
+            <p className="mt-2 text-green-500 text-center">
+              {successMessage}
             </p>
             )}
           </div>

@@ -42,12 +42,12 @@ export function generateResultsEmail(results: SpendingCategory[], name: string, 
       <table cellpadding="0" cellspacing="0" border="0" width="100%">
         <tr>
           <td style="padding: 0 0 20px 0;">
-            <p style="color: #006400; font-size: 18px; margin: 0;">We're actively building WhatCardWhen.</p>
+            <p style="color: #006400; font-size: 18px; margin: 0;">We're actively building WhatCardWhe, so please let us know what you think!</p>
           </td>
         </tr>
         <tr>
           <td style="padding: 0 0 20px 0;">
-            <p style="color: #006400; font-size: 18px; margin: 0;">Let us know what you think!! We're a team of 2 and we read every email.💕</p>
+            <p style="color: #006400; font-size: 18px; margin: 0;">We're a team of 2 and we read every email.💕</p>
           </td>
         </tr>
       </table>

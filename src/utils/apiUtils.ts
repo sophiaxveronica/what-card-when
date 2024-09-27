@@ -59,3 +59,25 @@ export const sendResultsEmail = async (email: string, name: string, htmlContent:
     throw error;
   }
 };
+
+export const addContact = async (email: string, name: string) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/emails/add-contact`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        name: name,
+        email: email,
+      }),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to add contact');
+    }
+    console.log('Added contact successfully');
+  } catch (error) {
+    console.error('Error adding contact:', error);
+    throw error;
+  }
+};
