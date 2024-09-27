@@ -281,16 +281,19 @@ export default function Component() {
                   {Array.isArray(cardOptions) ? (
                     cardOptions.map((card: string, index: number) => {
                       const isCardSelected = cards.some(c => c.company === selectedCompany && c.type === card);
+                      const isMaxCardsSelected = cards.length >= SELECTED_CARD_LIMIT;
                       return (
                         <button
                           key={index}
                           onClick={() => addCard(card)}
-                          className={`px-6 py-3 ${
-                            isCardSelected || cards.length >= SELECTED_CARD_LIMIT
-                              ? 'bg-gray-400 cursor-not-allowed' 
-                              : 'bg-neonGreen hover:bg-darkGreen'
-                          } text-white rounded-full transform hover:scale-105 transition duration-200 shadow-md`}
-                          disabled={isCardSelected || cards.length >= SELECTED_CARD_LIMIT}
+                          className={`px-6 py-3 text-white rounded-full transform transition duration-200 shadow-md ${
+                            isCardSelected 
+                              ? 'bg-gray-700 cursor-not-allowed' // Dark gray for selected cards
+                              : isMaxCardsSelected
+                              ? 'bg-gray-400 cursor-not-allowed' // Light gray for max limit reached
+                              : 'bg-neonGreen hover:bg-darkGreen hover:scale-105'
+                          }`}
+                          disabled={isCardSelected || isMaxCardsSelected}
                         >
                           {card}
                         </button>
@@ -302,6 +305,8 @@ export default function Component() {
                 </div>
               </div>
             )}
+
+            
 
             <div className="mt-6">
               <h2 className="text-2xl font-semibold mb-4 text-darkGreen">Selected Cards:</h2>
