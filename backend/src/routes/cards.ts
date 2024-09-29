@@ -6,6 +6,7 @@ const router = express.Router();
 interface CardType {
   company: string;
   type: string;
+  finePrint: string;
 }
 
 router.route('/companies').get(async (req, res) => {
@@ -43,7 +44,7 @@ router.route('/add').post((req, res) => {
 
 router.route('/filter').post(async (req, res) => {
   const { cards, categories }: { cards: CardType[], categories: string[] } = req.body;
-  const queries = cards.map((card: CardType) => ({ company: card.company, type: card.type }));
+  const queries = cards.map((card: CardType) => ({ company: card.company, type: card.type, finePrint: card.finePrint }));
 
   try {
     const cardTypes = await Card.find({ $or: queries });
@@ -59,7 +60,8 @@ router.route('/filter').post(async (req, res) => {
           bestCard = {
             company: card.company,
             type: card.type,
-            percentage: cashbackCategory.percentage
+            percentage: cashbackCategory.percentage,
+            finePrint: cashbackCategory.finePrint,
           };
         }
       });

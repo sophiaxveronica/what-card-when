@@ -8,7 +8,8 @@ const cardType = new Schema({
   type: { type: String, required: true },
   cashbackCategories: [{
     category: String,
-    percentage: Number
+    percentage: Number,
+    finePrint: String,
   }]
 }, { collection: 'cardTypes' });
 

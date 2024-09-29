@@ -4,6 +4,7 @@ export type SpendingCategory = {
       company: string;
       type: string;
       percentage: number;
+      finePrint: string;
     } | null;
   };
 

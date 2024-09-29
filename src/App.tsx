@@ -93,11 +93,11 @@ export default function Component() {
         setShowResults(true);
 
         // Then we create and send the email 
-        const htmlString = generateEmail(data, name, cards);
-        await Promise.race([
-          sendEmail(email, name, htmlString),
-          timeoutPromise(timeoutDuration)
-        ]);
+        // const htmlString = generateEmail(data, name, cards);
+        // await Promise.race([
+        //   sendEmail(email, name, htmlString),
+        //   timeoutPromise(timeoutDuration)
+        // ]);
 
         setSuccessMessage("Great! We've sent your results. Check your email!");
       } catch (error) {
@@ -310,7 +310,7 @@ export default function Component() {
 
         {/* RECOMMENDATIONS VIEW */}
         {showResults && (
-          <div className="bg-white p-8 rounded-t-3xl mt-10 ">
+          <div className="bg-white p-8 rounded-t-3xl -mt-2 ">
             <h2 className="text-3xl font-bold mb-6 gradient-text text-darkGreen">Your Optimal Card Usage:</h2>
             <div className="space-y-4">
               {results.map((category, index) => (
@@ -320,6 +320,7 @@ export default function Component() {
                     <>
                       <p className="text-darkGreen">Best Card: <span className="font-medium">{`${category.bestCard.company} - ${category.bestCard.type}`}</span></p>
                       <p className="text-darkGreen">Cashback: <span className="font-medium">{category.bestCard.percentage}%</span></p>
+                      <p className="text-darkGreen">Fine Print: <span className="font-small">{category.bestCard.finePrint}</span></p>
                     </>
                   ) : (
                     <p className="text-red-500">No card available for this category</p>
