@@ -14,7 +14,7 @@ export default {
         neonGreen: '#82ffa5ff',
       },
       fontFamily: {
-        'inter': ['"Inter"', 'sans-serif'],
+        'chivo': ['"Chivo"', 'sans-serif'], // Update to Chivo
       },
     },
   },

@@ -4,7 +4,7 @@
 
 @layer base {
   html {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Chivo', sans-serif;
   }
 
   h1,
@@ -13,7 +13,7 @@
   h4,
   h5,
   h6 {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Chivo', sans-serif;
   }
 
   body {
