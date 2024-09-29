@@ -109,8 +109,8 @@ export default function Component() {
   };
 
   return (
-    <div className="min-h-screen bg-lightGreen flex items-center justify-center p-8">
-      <div className="max-w-4xl w-full mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden border-4 border-darkGreen">
+    <div className="min-h-screen bg-lightPink flex items-center justify-center p-8">
+      <div className="max-w-4xl w-full mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden border-4 border-neonGreen">
         <div className="p-8">
           <h1 className="text-5xl font-bold mb-8 text-center gradient-text">
             What Card When?
@@ -137,9 +137,9 @@ export default function Component() {
                         };
                         setFormError('');
                       }}
-                      className="form-checkbox h-5 w-5 text-neonGreen border-gray-300 rounded focus:ring-neonGreen"
+                      className="form-checkbox h-5 w-5 text-darkPink border-gray-300 rounded focus:ring-lightPink"
                     />
-                    <label htmlFor={category} className="ml-2 text-lg text-darkGreen hover:text-neonGreen transition duration-200">
+                    <label htmlFor={category} className="ml-2 text-lg text-darkGreen hover:text-darkPink transition duration-200">
                       {capitalizeWords(category)}
                     </label>
                   </div>
@@ -166,7 +166,7 @@ export default function Component() {
                       console.error('Error fetching card options:', error);
                     }
                   }}
-                  className="mt-2 block w-full p-3 border-2 border-darkGreen rounded-xl focus:border-neonGreen focus:ring focus:ring-neonGreen transition duration-200"
+                  className="mt-2 block w-full p-3 border-2 border-darkGreen rounded-xl focus:border-darkPink focus:ring focus:ring-lightPink transition duration-200"
                 >
                   <option value="">Select a company</option>
                   {cardCompanies.map((company) => (
@@ -195,7 +195,7 @@ export default function Component() {
                             ? 'bg-gray-700 cursor-not-allowed' // Dark gray for selected cards
                             : isMaxCardsSelected
                               ? 'bg-gray-400 cursor-not-allowed' // Light gray for max limit reached
-                              : 'bg-neonGreen hover:bg-darkGreen hover:scale-105'
+                              : 'bg-darkPink hover:bg-neonGreen hover:scale-105'
                             }`}
                           disabled={isCardSelected || isMaxCardsSelected}
                         >
@@ -224,7 +224,7 @@ export default function Component() {
               ) : null}
               <div className="flex flex-wrap gap-4">
                 {cards.map((card, index) => (
-                  <div key={index} className="bg-neonGreen rounded-xl shadow-sm" style={{ width: '180px', aspectRatio: '1.586' }}>
+                  <div key={index} className="bg-lightPink rounded-xl shadow-sm" style={{ width: '180px', aspectRatio: '1.586' }}>
                     <div className="h-full p-4 flex flex-col justify-between">
                       <div className="flex-grow flex flex-col items-center justify-center text-center">
                         <p className="text-lg text-darkGreen font-medium">{card.company}</p>
@@ -254,7 +254,7 @@ export default function Component() {
                 type="text"
                 value={name}
                 onChange={handleNameInputChange}
-                className="mt-2 block w-full p-3 border-2 border-darkGreen rounded-xl focus:ring focus:ring-neonGreen transition duration-200"
+                className="mt-2 block w-full p-3 border-2 border-darkGreen rounded-xl focus:ring focus:ring-darkPink transition duration-200"
                 placeholder="Your Name"
               />
             </div>
@@ -267,8 +267,8 @@ export default function Component() {
                 type="email"
                 value={email}
                 onChange={handleEmailInputChange}
-                className={`mt-2 block w-full p-3 border-2 ${isValidEmail ? 'border-neonGreen' : 'border-darkGreen'
-                  } rounded-xl focus:ring focus:ring-neonGreen transition duration-200`}
+                className={`mt-2 block w-full p-3 border-2 ${isValidEmail ? 'border-darkPink' : 'border-darkGreen'
+                  } rounded-xl focus:ring focus:ring-darkPink transition duration-200`}
                 placeholder="your@email.com"
               />
               {email && !isValidEmail && (
@@ -285,7 +285,7 @@ export default function Component() {
               onClick={handleGenerateAndEmailResults}
               className={`w-full py-4 rounded-full text-xl font-bold shadow-lg transform transition duration-200 
             ${isFormValid(selectedCategories, cards, isValidEmail, name)
-                  ? 'bg-darkGreen hover:bg-neonGreen text-white hover:scale-105'
+                  ? 'bg-darkPink hover:bg-neonGreen text-white hover:scale-105'
                   : 'bg-gray-400 text-gray-600 cursor-not-allowed'}`}
             >
               Get your results!
@@ -310,12 +310,12 @@ export default function Component() {
 
         {/* RECOMMENDATIONS VIEW */}
         {showResults && (
-          <div className="bg-white p-8 rounded-t-3xl mt-8 ">
-            <h2 className="text-3xl font-bold mb-6 text-darkGreen">Your Optimal Card Usage:</h2>
+          <div className="bg-white p-8 rounded-t-3xl mt-10 ">
+            <h2 className="text-3xl font-bold mb-6 gradient-text text-darkGreen">Your Optimal Card Usage:</h2>
             <div className="space-y-4">
               {results.map((category, index) => (
                 <div key={index} className="bg-white p-4 rounded-xl shadow-md border-2 border-darkGreen">
-                  <h3 className="text-xl font-semibold text-neonGreen mb-2">{capitalizeWords(category.category)}</h3>
+                  <h3 className="text-xl font-semibold text-darkPink mb-2">{capitalizeWords(category.category)}</h3>
                   {category.bestCard ? (
                     <>
                       <p className="text-darkGreen">Best Card: <span className="font-medium">{`${category.bestCard.company} - ${category.bestCard.type}`}</span></p>

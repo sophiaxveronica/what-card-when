@@ -47,7 +47,7 @@ export function generateEmail(results: SpendingCategory[], name: string, cards: 
         </tr>
         <tr>
           <td style="padding: 0 0 20px 0;">
-            <p style="color: #006400; font-size: 18px; margin: 0;">We are a team of 2 engineers and we read every email.💕</p>
+            <p style="color: #006400; font-size: 18px; margin: 0;">We are a team of 2 engineers and we read every email💕</p>
           </td>
         </tr>
       </table>

@@ -17,25 +17,25 @@
   }
 
   body {
-    background-color: white;
+background-color: white;
     color: #006400;
   }
 }
 
 
 .gradient-text {
-  background: linear-gradient(90deg, #ff007f, #ff7f00, #ffff00, #7fff00, #00ff7f, #00ffff, #007fff, #7f00ff);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  position: relative;
-}
-
-.gradient-text::after {
-  content: 'What Card When?';
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: -1;
-  color: rgba(0, 0, 0, 0.1);
-  transform: translate(10px, 10px);
-}
+    -webkit-background-clip: text;
+    position: relative;
+    font-family: 'Dela Gothic One', sans-serif; /* Use Dela Gothic One font */
+    color: #ff4fae;
+  }
+  
+  .gradient-text::after {
+    content: 'What Card When?';
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    color: rgba(0, 0, 0, 0.1);
+    transform: translate(10px, 10px);
+  }
