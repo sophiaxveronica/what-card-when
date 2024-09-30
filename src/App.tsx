@@ -109,8 +109,8 @@ export default function Component() {
   };
 
   return (
-    <div className="min-h-screen bg-lightPink flex items-center justify-center p-8">
-      <div className="max-w-4xl w-full mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden border-4 border-neonGreen">
+    <div className="min-h-screen bg-lightGreen flex items-center justify-center p-8">
+      <div className="max-w-4xl w-full mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden border-4 border-darkGreen">
         <div className="p-8">
           <h1 className="text-5xl font-bold mb-8 text-center gradient-text">
             What Card When?
@@ -119,7 +119,7 @@ export default function Component() {
           {/* SPENDING CATEGORY CHECKBOX SECTION */}
           <div className="space-y-8">
             <div>
-              <Label htmlFor="category-select" className="text-lg font-medium text-darkGreen">
+              <Label htmlFor="category-select" className="text-xl font-semibold font-medium text-darkGreen">
                 Select categories
               </Label>
               <div className="grid grid-cols-2 gap-4 mt-2 border border-darkGreen rounded-lg p-4 bg-gray-50">
@@ -137,9 +137,9 @@ export default function Component() {
                         };
                         setFormError('');
                       }}
-                      className="form-checkbox h-5 w-5 text-darkPink border-gray-300 rounded focus:ring-lightPink"
+                      className="form-checkbox h-5 w-5 text-lightGreen border-gray-300 rounded focus:ring-lightPink"
                     />
-                    <label htmlFor={category} className="ml-2 text-lg text-darkGreen hover:text-darkPink transition duration-200">
+                    <label htmlFor={category} className="ml-2 text-lg text-darkGreen hover:text-lightGreen transition duration-200">
                       {capitalizeWords(category)}
                     </label>
                   </div>
@@ -149,7 +149,7 @@ export default function Component() {
 
             {/* CREDIT CARD COMPANY DROPDOWN */}
             <div>
-              <Label htmlFor="company-select" className="text-lg font-medium text-darkGreen">
+              <Label htmlFor="company-select" className="text-xl font-semibold font-medium text-darkGreen">
                 Select card company
               </Label>
               <div className="space-y-8">
@@ -166,7 +166,7 @@ export default function Component() {
                       console.error('Error fetching card options:', error);
                     }
                   }}
-                  className="mt-2 block w-full p-3 border-2 border-darkGreen rounded-xl focus:border-darkPink focus:ring focus:ring-lightPink transition duration-200"
+                  className="mt-2 block w-full p-3 border-2 border-darkGreen rounded-xl focus:border-lightGreen focus:ring focus:ring-lightPink transition duration-200"
                 >
                   <option value="">Select a company</option>
                   {cardCompanies.map((company) => (
@@ -181,7 +181,7 @@ export default function Component() {
             {/* CARD SELECTION FOR A SPECIFIC COMPANY */}
             {selectedCompany && (
               <div>
-                <h2 className="text-2xl font-semibold mb-4 text-darkGreen">Select cards:</h2>
+                <h2 className="text-xl font-semibold mb-4 text-darkGreen">Select cards:</h2>
                 <div className="flex flex-wrap gap-3">
                   {Array.isArray(cardOptions) ? (
                     cardOptions.map((card: string, index: number) => {
@@ -195,7 +195,7 @@ export default function Component() {
                             ? 'bg-gray-700 cursor-not-allowed' // Dark gray for selected cards
                             : isMaxCardsSelected
                               ? 'bg-gray-400 cursor-not-allowed' // Light gray for max limit reached
-                              : 'bg-darkPink hover:bg-neonGreen hover:scale-105'
+                              : 'bg-darkGreen hover:bg-lightGreen hover:scale-105'
                             }`}
                           disabled={isCardSelected || isMaxCardsSelected}
                         >
@@ -212,7 +212,7 @@ export default function Component() {
 
             {/* CURRENTLY SELECTED CARDS VIEW */}
             <div className="mt-6">
-              <h2 className="text-2xl font-semibold mb-4 text-darkGreen">Selected cards:</h2>
+              <h2 className="text-xl font-semibold mb-4 text-darkGreen">Selected cards:</h2>
               {cards.length === SELECTED_CARD_LIMIT ? (
                 <p className="mb-4 text-yellow-600 font-medium">
                   You can select up to {SELECTED_CARD_LIMIT} cards.
@@ -224,7 +224,7 @@ export default function Component() {
               ) : null}
               <div className="flex flex-wrap gap-4">
                 {cards.map((card, index) => (
-                  <div key={index} className="bg-lightPink rounded-xl shadow-sm" style={{ width: '180px', aspectRatio: '1.586' }}>
+                  <div key={index} className="bg-lightGreen rounded-xl shadow-sm" style={{ width: '180px', aspectRatio: '1.586' }}>
                     <div className="h-full p-4 flex flex-col justify-between">
                       <div className="flex-grow flex flex-col items-center justify-center text-center">
                         <p className="text-lg text-darkGreen font-medium">{card.company}</p>
@@ -246,7 +246,7 @@ export default function Component() {
           {/* FORM INPUTS FOR THE EMAIL */}
           <div className="mt-6 space-y-4">
             <div>
-              <Label htmlFor="name-input" className="text-lg font-medium text-darkGreen">
+              <Label htmlFor="name-input" className="text-xl font-semibold font-medium text-darkGreen">
                 Enter your name
               </Label>
               <input
@@ -254,12 +254,12 @@ export default function Component() {
                 type="text"
                 value={name}
                 onChange={handleNameInputChange}
-                className="mt-2 block w-full p-3 border-2 border-darkGreen rounded-xl focus:ring focus:ring-darkPink transition duration-200"
+                className="mt-2 block w-full p-3 border-2 border-darkGreen rounded-xl focus:ring focus:ring-lightGreen transition duration-200"
                 placeholder="Your Name"
               />
             </div>
             <div>
-              <Label htmlFor="email-input" className="text-lg font-medium text-darkGreen">
+              <Label htmlFor="email-input" className="text-xl font-semibold font-medium text-darkGreen">
                 Enter your email to receive results
               </Label>
               <input
@@ -267,8 +267,8 @@ export default function Component() {
                 type="email"
                 value={email}
                 onChange={handleEmailInputChange}
-                className={`mt-2 block w-full p-3 border-2 ${isValidEmail ? 'border-darkPink' : 'border-darkGreen'
-                  } rounded-xl focus:ring focus:ring-darkPink transition duration-200`}
+                className={`mt-2 block w-full p-3 border-2 ${isValidEmail ? 'border-lightGreen' : 'border-darkGreen'
+                  } rounded-xl focus:ring focus:ring-lightGreen transition duration-200`}
                 placeholder="your@email.com"
               />
               {email && !isValidEmail && (
@@ -285,7 +285,7 @@ export default function Component() {
               onClick={handleGenerateAndEmailResults}
               className={`w-full py-4 rounded-full text-xl font-bold shadow-lg transform transition duration-200 
             ${isFormValid(selectedCategories, cards, isValidEmail, name)
-                  ? 'bg-darkPink hover:bg-neonGreen text-white hover:scale-105'
+                  ? 'bg-lightGreen hover:bg-darkGreen text-white hover:scale-105'
                   : 'bg-gray-400 text-gray-600 cursor-not-allowed'}`}
             >
               Get your results!
@@ -315,7 +315,7 @@ export default function Component() {
             <div className="space-y-4">
               {results.map((category, index) => (
                 <div key={index} className="bg-white p-4 rounded-xl shadow-md border-2 border-darkGreen">
-                  <h3 className="text-xl font-semibold text-darkPink mb-2">{capitalizeWords(category.category)}</h3>
+                  <h3 className="text-xl font-semibold text-lightGreen mb-2">{capitalizeWords(category.category)}</h3>
                   {category.bestCard ? (
                     <>
                       <p className="text-darkGreen">Best Card: <span className="font-medium">{`${category.bestCard.company} - ${category.bestCard.type}`}</span></p>

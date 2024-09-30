@@ -26,8 +26,8 @@ background-color: white;
 .gradient-text {
     -webkit-background-clip: text;
     position: relative;
-    font-family: 'Dela Gothic One', sans-serif; /* Use Dela Gothic One font */
-    color: #ff4fae;
+    font-family: 'chivo', sans-serif; /* Use Dela Gothic One font */
+    color: #006400;
   }
   
   .gradient-text::after {
