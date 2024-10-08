@@ -5,24 +5,12 @@ import React from 'react';
 import './index.css';
 import { capitalizeWords } from './utils/stringUtils';
 import { validateEmail, isFormValid, createFormErrorMessage } from './utils/validationUtils';
-import { generateEmail } from './utils/emailUtils';
-import { fetchCardCompanies, fetchCardOptions, calculateRecommendations, sendEmail } from './utils/apiUtils';
+import { fetchCardCompanies, fetchCardCategories, fetchCardOptions, calculateRecommendations } from './utils/apiUtils';
 import { SpendingCategory, Card } from './types';
 
 const timeoutPromise = (ms: number) => new Promise((_, reject) => setTimeout(() => reject(new Error('Request timed out')), ms));
 
 const SELECTED_CARD_LIMIT = 6;
-
-const categories = [
-  'dining',
-  'lyft',
-  'uber',
-  'public transport',
-  'groceries',
-  'gas',
-  'hotels',
-  'flights'
-];
 
 export default function Component() {
   const [cards, setCards] = useState<{ company: string; type: string }[]>([]);
@@ -31,6 +19,7 @@ export default function Component() {
   const [results, setResults] = useState<SpendingCategory[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [cardCompanies, setCardCompanies] = useState<string[]>([]);
+  const [cardCategories, setCardCategories] = useState<string[]>([]);
   const [cardOptions, setCardOptions] = useState<string[]>([]);
   const [email, setEmail] = useState('');
   const [isValidEmail, setIsValidEmail] = useState(false);
@@ -41,6 +30,7 @@ export default function Component() {
 
   useEffect(() => {
     fetchCardCompanies().then(setCardCompanies);
+    fetchCardCategories().then(setCardCategories);
   }, []);
 
   // Form validation for email field
@@ -123,7 +113,7 @@ export default function Component() {
                 Select categories
               </Label>
               <div className="grid grid-cols-2 gap-4 mt-2 border border-darkGreen rounded-lg p-4 bg-gray-50">
-                {categories.map((category) => (
+                {cardCategories.map((category) => (
                   <div key={category} className="flex items-center">
                     <input
                       type="checkbox"

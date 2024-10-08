@@ -29,6 +29,17 @@ router.route('/companies2').get(async (req, res) => {
   }
 });
 
+router.route('/categories').get(async (req, res) => {
+  try {
+    const categories = await DetailedCard.distinct('rewards.category');
+    console.log('Distinct categories:', categories); // Log the result
+    res.json(categories);
+  } catch (err) {
+    console.error('Error fetching distinct categories:', err); // Log the error
+    res.status(400).json('Error: ' + err);
+  }
+});
+
 router.route('/options/:company').get(async (req, res) => {
   const { company } = req.params;
   try {
@@ -57,6 +68,12 @@ router.route('/').get((req, res) => {
     .catch(err => res.status(400).json('Error: ' + err));
 });
 
+router.route('/2').get((req, res) => {
+  DetailedCard.find()
+    .then(cards => res.json(cards))
+    .catch(err => res.status(400).json('Error: ' + err));
+});
+
 router.route('/add').post((req, res) => {
   const newCard = new Card(req.body);
 
@@ -64,6 +81,12 @@ router.route('/add').post((req, res) => {
     .then(() => res.json('Card added!'))
     .catch(err => res.status(400).json('Error: ' + err));
 });
+
+interface DetailedCard {
+  company: string;
+  card: string;
+  finePrint: string;
+}
 
 router.route('/filter').post(async (req, res) => {
   const { cards, categories }: { cards: CardType[], categories: string[] } = req.body;

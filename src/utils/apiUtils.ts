@@ -10,6 +10,16 @@ export const fetchCardCompanies = async () => {
   }
 };
 
+export const fetchCardCategories = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/cards/categories`);
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching card companies:', error);
+    throw error;
+  }
+};
+
 export const fetchCardOptions = async (company: string) => {
   try {
     const response = await fetch(`${API_BASE_URL}/cards/options2/${company}`);
