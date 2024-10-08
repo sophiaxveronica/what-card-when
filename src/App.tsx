@@ -177,7 +177,6 @@ export default function Component() {
                 </select>
               </div>
             </div>
-
             {/* CARD SELECTION FOR A SPECIFIC COMPANY */}
             {selectedCompany && (
               <div>
