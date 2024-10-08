@@ -1,5 +1,5 @@
 import express from 'express';
-import Card from '../models/card.model';
+import { Card, DetailedCard } from '../models/card.model';
 
 const router = express.Router();
 
@@ -18,10 +18,33 @@ router.route('/companies').get(async (req, res) => {
   }
 });
 
+router.route('/companies2').get(async (req, res) => {
+  try {
+    const detailedCards = await DetailedCard.distinct('company');
+    console.log('Distinct companies:', detailedCards); // Log the result
+    res.json(detailedCards);
+  } catch (err) {
+    console.error('Error fetching distinct companies:', err); // Log the error
+    res.status(400).json('Error: ' + err);
+  }
+});
+
 router.route('/options/:company').get(async (req, res) => {
   const { company } = req.params;
   try {
     const options = await Card.find({ company }).distinct('type');
+    res.json(options);
+  } catch (err) {
+    res.status(400).json('Error: ' + err);
+  }
+});
+
+router.route('/options2/:company').get(async (req, res) => {
+  const { company } = req.params;
+  try {
+    console.log(company);
+    const options = await DetailedCard.find({ company }).distinct('card');
+    console.log('Distinct options for type:', options); // Log the result
     res.json(options);
   } catch (err) {
     res.status(400).json('Error: ' + err);
