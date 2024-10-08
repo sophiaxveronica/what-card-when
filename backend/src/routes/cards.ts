@@ -82,33 +82,37 @@ router.route('/add').post((req, res) => {
     .catch(err => res.status(400).json('Error: ' + err));
 });
 
-interface DetailedCard {
-  company: string;
-  card: string;
-  finePrint: string;
-}
-
 router.route('/filter').post(async (req, res) => {
   const { cards, categories }: { cards: CardType[], categories: string[] } = req.body;
   const queries = cards.map((card: CardType) => ({ company: card.company, type: card.type, finePrint: card.finePrint }));
 
   try {
-    const cardTypes = await Card.find({ $or: queries });
+    // Fetch detailed cards based on the queries
+    const detailedCards = await DetailedCard.find({ $or: queries });
 
     const bestCards = categories.map(category => {
       let bestCard = null;
-      let highestPercentage = 0;
+      let highestValue = 0; // This will hold the highest value (cashback or points)
 
-      cardTypes.forEach(card => {
-        const cashbackCategory = card.cashbackCategories.find(c => c.category === category);
-        if (cashbackCategory && cashbackCategory?.percentage && cashbackCategory?.percentage > highestPercentage) {
-          highestPercentage = cashbackCategory.percentage;
-          bestCard = {
-            company: card.company,
-            type: card.type,
-            percentage: cashbackCategory.percentage,
-            finePrint: cashbackCategory.finePrint,
-          };
+      detailedCards.forEach(card => {
+        // Assuming cashback and points are stored in the rewards array
+        const reward = card.rewards.find(r => r.category === category);
+        if (reward) {
+          const cashBackValue = reward.cash_back_pct || 0; // Assuming cash_back_pct is the cashback percentage
+          const pointsValue = reward.points_per_dollar || 0; // Assuming points_per_dollar is the points value
+
+          // Determine the higher value between cashback and points
+          const higherValue = Math.max(cashBackValue, pointsValue);
+
+          if (higherValue > highestValue) {
+            highestValue = higherValue;
+            bestCard = {
+              company: card.company,
+              type: card.card, // Assuming 'card' is the field for the card name
+              value: higherValue, // This will hold the higher value (cashback or points)
+              finePrint: reward.fine_print, // Assuming fine_print is available in the reward
+            };
+          }
         }
       });
 

@@ -19,7 +19,8 @@ const cardSchema = new Schema({
   annual_fee_usd: { type: Number, required: true },
   rewards: [{
     category: String,
-    cash_back_pct: Number,
+    cash_back_pct: { type: Number, required: false},    
+    points_per_dollar: { type: Number, required: false},
     fine_print: String,
     fine_print_source: String,
   }]
