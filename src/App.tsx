@@ -6,7 +6,7 @@ import './index.css';
 import { capitalizeWords } from './utils/stringUtils';
 import { validateEmail, isFormValid, createFormErrorMessage } from './utils/validationUtils';
 import { fetchCardCompanies, fetchCardCategories, fetchCardOptions, calculateRecommendations } from './utils/apiUtils';
-import { SpendingCategory, Card } from './types';
+import { SpendingCategory, CreditCard } from './types';
 
 const timeoutPromise = (ms: number) => new Promise((_, reject) => setTimeout(() => reject(new Error('Request timed out')), ms));
 

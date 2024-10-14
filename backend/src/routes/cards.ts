@@ -1,9 +1,9 @@
 import express from 'express';
-import { Card, DetailedCard } from '../models/card.model';
+import { CreditCardData } from '../models/card.model';
 
 const router = express.Router();
 
-interface CardType {
+type CreditCardApiType = {
   company: string;
   type: string;
   finePrint: string;
@@ -11,31 +11,20 @@ interface CardType {
 
 router.route('/companies').get(async (req, res) => {
   try {
-    const companies = await Card.distinct('company');
-    res.json(companies);
-  } catch (err) {
-    res.status(400).json('Error: ' + err);
-  }
-});
-
-router.route('/companies2').get(async (req, res) => {
-  try {
-    const detailedCards = await DetailedCard.distinct('company');
-    console.log('Distinct companies:', detailedCards); // Log the result
+    const detailedCards :string[] = await CreditCardData.distinct('company');
     res.json(detailedCards);
   } catch (err) {
-    console.error('Error fetching distinct companies:', err); // Log the error
+    console.error('Error fetching distinct companies:', err);
     res.status(400).json('Error: ' + err);
   }
 });
 
 router.route('/categories').get(async (req, res) => {
   try {
-    const categories = await DetailedCard.distinct('rewards.category');
-    console.log('Distinct categories:', categories); // Log the result
+    const categories :string[] = await CreditCardData.distinct('rewards.category');
     res.json(categories);
   } catch (err) {
-    console.error('Error fetching distinct categories:', err); // Log the error
+    console.error('Error fetching distinct categories:', err);
     res.status(400).json('Error: ' + err);
   }
 });
@@ -43,19 +32,7 @@ router.route('/categories').get(async (req, res) => {
 router.route('/options/:company').get(async (req, res) => {
   const { company } = req.params;
   try {
-    const options = await Card.find({ company }).distinct('type');
-    res.json(options);
-  } catch (err) {
-    res.status(400).json('Error: ' + err);
-  }
-});
-
-router.route('/options2/:company').get(async (req, res) => {
-  const { company } = req.params;
-  try {
-    console.log(company);
-    const options = await DetailedCard.find({ company }).distinct('card');
-    console.log('Distinct options for type:', options); // Log the result
+    const options = await CreditCardData.find({ company }).distinct('card');
     res.json(options);
   } catch (err) {
     res.status(400).json('Error: ' + err);
@@ -63,19 +40,13 @@ router.route('/options2/:company').get(async (req, res) => {
 });
 
 router.route('/').get((req, res) => {
-  Card.find()
-    .then(cards => res.json(cards))
-    .catch(err => res.status(400).json('Error: ' + err));
-});
-
-router.route('/2').get((req, res) => {
-  DetailedCard.find()
+  CreditCardData.find()
     .then(cards => res.json(cards))
     .catch(err => res.status(400).json('Error: ' + err));
 });
 
 router.route('/add').post((req, res) => {
-  const newCard = new Card(req.body);
+  const newCard = new CreditCardData(req.body);
 
   newCard.save()
     .then(() => res.json('Card added!'))
@@ -83,12 +54,15 @@ router.route('/add').post((req, res) => {
 });
 
 router.route('/filter').post(async (req, res) => {
-  const { cards, categories }: { cards: CardType[], categories: string[] } = req.body;
-  const queries = cards.map((card: CardType) => ({ company: card.company, type: card.type, finePrint: card.finePrint }));
+  const { cards, categories }: { cards: CreditCardApiType[], categories: string[] } = req.body;
+  console.log("FILTER");
+  console.log(cards);
+  const queries = cards.map((card: CreditCardApiType) => ({ company: card.company, type: card.type, finePrint: card.finePrint }));
 
   try {
     // Fetch detailed cards based on the queries
-    const detailedCards = await DetailedCard.find({ $or: queries });
+    const detailedCards = await CreditCardData.find({ $or: queries });
+    console.log("Fetched cards:", detailedCards);
 
     const bestCards = categories.map(category => {
       let bestCard = null;

@@ -2,7 +2,7 @@ const API_BASE_URL = 'http://localhost:5001/api';
 
 export const fetchCardCompanies = async () => {
   try {
-    const response = await fetch(`${API_BASE_URL}/cards/companies2`);
+    const response = await fetch(`${API_BASE_URL}/cards/companies`);
     return await response.json();
   } catch (error) {
     console.error('Error fetching card companies:', error);
@@ -22,7 +22,7 @@ export const fetchCardCategories = async () => {
 
 export const fetchCardOptions = async (company: string) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/cards/options2/${company}`);
+    const response = await fetch(`${API_BASE_URL}/cards/options/${company}`);
     return await response.json();
   } catch (error) {
     console.error('Error fetching card options:', error);

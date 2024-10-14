@@ -8,7 +8,7 @@ export type SpendingCategory = {
     } | null;
   };
 
-  export type Card = {
+  export type CreditCard = {
     company: string;
-    type: string;
+    card: string;
   };

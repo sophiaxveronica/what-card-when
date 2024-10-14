@@ -2,17 +2,6 @@ import mongoose from 'mongoose';
 
 const Schema = mongoose.Schema;
 
-const cardType = new Schema({
-  company: { type: String, required: true },
-  type: { type: String, required: true },
-  cashbackCategories: [{
-    category: String,
-    percentage: Number,
-    finePrint: String,
-  }]
-}, { collection: 'cardTypes' , dbName: 'test' });
-
-// New schema for the 'cards' collection
 const cardSchema = new Schema({
   company: { type: String, required: true },
   card: { type: String, required: true },
@@ -26,7 +15,6 @@ const cardSchema = new Schema({
   }]
 }, { collection: 'cards' , dbName: 'wcw-db' });
 
-const Card = mongoose.model('Card', cardType, 'cardTypes');
-const DetailedCard = mongoose.model('DetailedCard', cardSchema, 'cards');
+const CreditCardData = mongoose.model('CreditCardData', cardSchema, 'cards');
 
-export { Card, DetailedCard };
+export { CreditCardData };
