@@ -6,17 +6,17 @@ import './index.css';
 import { capitalizeWords } from './utils/stringUtils';
 import { validateEmail, isFormValid, createFormErrorMessage } from './utils/validationUtils';
 import { fetchCardCompanies, fetchCardCategories, fetchCardOptions, calculateRecommendations } from './utils/apiUtils';
-import { SpendingCategory, CreditCard } from './types';
+import { CategoryWithBestCreditCard } from './types';
 
 const timeoutPromise = (ms: number) => new Promise((_, reject) => setTimeout(() => reject(new Error('Request timed out')), ms));
 
 const SELECTED_CARD_LIMIT = 6;
 
 export default function Component() {
-  const [cards, setCards] = useState<{ company: string; type: string }[]>([]);
+  const [cards, setCards] = useState<{ company: string; card_name: string }[]>([]);
   const [selectedCompany, setSelectedCompany] = useState('');
   const [showResults, setShowResults] = useState(false);
-  const [results, setResults] = useState<SpendingCategory[]>([]);
+  const [results, setResults] = useState<CategoryWithBestCreditCard[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [cardCompanies, setCardCompanies] = useState<string[]>([]);
   const [cardCategories, setCardCategories] = useState<string[]>([]);
@@ -48,9 +48,9 @@ export default function Component() {
   };
 
   // Helper for selecting card
-  const addCard = (type: string) => {
-    if (!cards.some(card => card.company === selectedCompany && card.type === type)) {
-      setCards([...cards, { company: selectedCompany, type }]);
+  const addCard = (card_name: string) => {
+    if (!cards.some(card => card.company === selectedCompany && card.card_name === card_name)) {
+      setCards([...cards, { company: selectedCompany, card_name }]);
     }
     setFormError('');
   };
@@ -75,8 +75,9 @@ export default function Component() {
         const timeoutDuration = 3000; // 3 second timeout, TODO: is this too short?
 
         // First we calculate the recommendations and display them
+        const card_names :string[] = cards.map(card => card.card_name)
         const data = await Promise.race([
-          calculateRecommendations(cards, selectedCategories),
+          calculateRecommendations(card_names, selectedCategories),
           timeoutPromise(timeoutDuration)
         ]);
         setResults(data);
@@ -174,7 +175,7 @@ export default function Component() {
                 <div className="flex flex-wrap gap-3">
                   {Array.isArray(cardOptions) ? (
                     cardOptions.map((card: string, index: number) => {
-                      const isCardSelected = cards.some(c => c.company === selectedCompany && c.type === card);
+                      const isCardSelected = cards.some(c => c.company === selectedCompany && c.card_name === card);
                       const isMaxCardsSelected = cards.length >= SELECTED_CARD_LIMIT;
                       return (
                         <button
@@ -217,7 +218,7 @@ export default function Component() {
                     <div className="h-full p-4 flex flex-col justify-between">
                       <div className="flex-grow flex flex-col items-center justify-center text-center">
                         <p className="text-lg text-darkGreen font-medium">{card.company}</p>
-                        <p className="text-md text-darkGreen">{card.type}</p>
+                        <p className="text-md text-darkGreen">{card.card_name}</p>
                       </div>
                       <button
                         onClick={() => removeCard(index)}
@@ -305,11 +306,11 @@ export default function Component() {
               {results.map((category, index) => (
                 <div key={index} className="bg-white p-4 rounded-xl shadow-md border-2 border-darkGreen">
                   <h3 className="text-xl font-semibold text-lightGreen mb-2">{capitalizeWords(category.category)}</h3>
-                  {category.bestCard ? (
+                  {category.best_card ? (
                     <>
-                      <p className="text-darkGreen">Best Card: <span className="font-medium">{`${category.bestCard.company} - ${category.bestCard.type}`}</span></p>
-                      <p className="text-darkGreen">Cashback: <span className="font-medium">{category.bestCard.percentage}%</span></p>
-                      <p className="text-darkGreen">Fine Print: <span className="font-small">{category.bestCard.finePrint}</span></p>
+                      <p className="text-darkGreen">Best Card: <span className="font-medium">{`${category.best_card.company} - ${category.best_card.card_name}`}</span></p>
+                      <p className="text-darkGreen">Cashback: <span className="font-medium">{category.best_card.cash_back_pct}%</span></p>
+                      <p className="text-darkGreen">Fine Print: <span className="font-small">{category.best_card.fine_print}</span></p>
                     </>
                   ) : (
                     <p className="text-red-500">No card available for this category</p>

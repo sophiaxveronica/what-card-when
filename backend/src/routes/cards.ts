@@ -53,25 +53,28 @@ router.route('/add').post((req, res) => {
     .catch(err => res.status(400).json('Error: ' + err));
 });
 
+
 router.route('/filter').post(async (req, res) => {
-  const { cards, categories }: { cards: CreditCardApiType[], categories: string[] } = req.body;
-  console.log("FILTER");
-  console.log(cards);
-  const queries = cards.map((card: CreditCardApiType) => ({ company: card.company, type: card.type, finePrint: card.finePrint }));
+  const { card_names, selected_categories }: { card_names: string[], selected_categories: string[] } = req.body;
 
   try {
-    // Fetch detailed cards based on the queries
-    const detailedCards = await CreditCardData.find({ $or: queries });
-    console.log("Fetched cards:", detailedCards);
+    // Load the credit card data for the inputted cards
+    const selected_credit_cards = await CreditCardData.find({ card: { $in: card_names } });
+    console.log("Fetched cards:", selected_credit_cards);
 
-    const bestCards = categories.map(category => {
+    // Iteratively determine the best card for each category
+    const bestCards = selected_categories.map(category => {
+      console.log("Category", category);
       let bestCard = null;
       let highestValue = 0; // This will hold the highest value (cashback or points)
 
-      detailedCards.forEach(card => {
-        // Assuming cashback and points are stored in the rewards array
-        const reward = card.rewards.find(r => r.category === category);
+      selected_credit_cards.forEach(card => {
+        console.log("CARD", card.card);
+
+        // Check if this card has any specific rewards for the category
+        const reward = card.rewards.find(r => r.category == category);
         if (reward) {
+          console.log("CARD", card.rewards);
           const cashBackValue = reward.cash_back_pct || 0; // Assuming cash_back_pct is the cashback percentage
           const pointsValue = reward.points_per_dollar || 0; // Assuming points_per_dollar is the points value
 
@@ -86,7 +89,9 @@ router.route('/filter').post(async (req, res) => {
               value: higherValue, // This will hold the higher value (cashback or points)
               finePrint: reward.fine_print, // Assuming fine_print is available in the reward
             };
-          }
+          } 
+        } else {
+          console.log("No reward found for category:", category, "in card:", card.card);
         }
       });
 

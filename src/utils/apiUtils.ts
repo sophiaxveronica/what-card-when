@@ -30,14 +30,14 @@ export const fetchCardOptions = async (company: string) => {
   }
 };
 
-export const calculateRecommendations = async (cards: any[], selectedCategories: string[]) => {
+export const calculateRecommendations = async (card_names: string[], selected_categories: string[]) => {
   try {
     const response = await fetch(`${API_BASE_URL}/cards/filter`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ cards, categories: selectedCategories }),
+      body: JSON.stringify({ card_names, selected_categories }),
     });
     return await response.json();
   } catch (error) {
