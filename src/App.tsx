@@ -5,7 +5,9 @@ import React from 'react';
 import './index.css';
 import { capitalizeWords } from './utils/stringUtils';
 import { validateEmail, isFormValid, createFormErrorMessage } from './utils/validationUtils';
-import { fetchCardCompanies, fetchCardCategories, fetchCardOptions, calculateRecommendations } from './utils/apiUtils';
+import { fetchCardCompanies, fetchCardCategories, fetchCardOptions, calculateRecommendations, sendEmail } from './utils/apiUtils';
+import { generateEmail } from './utils/emailUtils';
+
 import { CategoryWithBestCreditCard } from './types';
 
 const timeoutPromise = (ms: number) => new Promise((_, reject) => setTimeout(() => reject(new Error('Request timed out')), ms));
@@ -90,11 +92,11 @@ export default function Component() {
         setShowResults(true);
 
         // Then we create and send the email 
-        // const htmlString = generateEmail(data, name, cards);
-        // await Promise.race([
-        //   sendEmail(email, name, htmlString),
-        //   timeoutPromise(timeoutDuration)
-        // ]);
+        const htmlString = generateEmail(data, name, card_names);
+        await Promise.race([
+        sendEmail(email, name, htmlString),
+        timeoutPromise(timeoutDuration)
+        ]);
 
         setSuccessMessage("Great! We've sent your results. Check your email!");
       } catch (error) {
@@ -311,8 +313,6 @@ export default function Component() {
             <h2 className="text-3xl font-bold mb-6 gradient-text text-darkGreen">Your Optimal Card Usage:</h2>
             <div className="space-y-4">
               {results.map((category, index) => {
-                console.log(category);
-                console.log();
               return (
                   <div key={index} className="bg-white p-4 rounded-xl shadow-md border-2 border-darkGreen">
                     <h3 className="text-xl font-semibold text-darkGreen mb-2">{capitalizeWords(category.category)}</h3>
