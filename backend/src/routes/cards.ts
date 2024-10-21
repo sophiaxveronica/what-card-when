@@ -54,6 +54,16 @@ router.route('/add').post((req, res) => {
 });
 
 
+// Define the BestCard type
+type BestCard = {
+  company: string,
+  card_name: string,
+  cash_back_pct?: number,
+  points_per_dollar?: number,
+  fine_print: string,
+  fine_print_source: string,
+};
+
 router.route('/filter').post(async (req, res) => {
   const { card_names, selected_categories }: { card_names: string[], selected_categories: string[] } = req.body;
 
@@ -63,7 +73,7 @@ router.route('/filter').post(async (req, res) => {
 
     // Iteratively determine the best card for each category
     const bestCards = selected_categories.map(category => {
-      let bestCard = null;
+      const bestCardsList: BestCard[] = []; // Array to hold the best cards for each category
       let highestValue = 0; // This will hold the highest value (cashback or points)
 
       selected_credit_cards.forEach(card => {
@@ -79,20 +89,30 @@ router.route('/filter').post(async (req, res) => {
 
           if (higherValue > highestValue) {
             highestValue = higherValue;
-            bestCard = {
+            bestCardsList.length = 0; // Clear the list if we found a better card
+            bestCardsList.push({
               company: card.company,
-              card_name: card.card, // Assuming 'card' is the field for the card name
-              cash_back_pct: cashBackValue >= pointsValue ? cashBackValue : null,
-              points_per_dollar: pointsValue >= cashBackValue ? pointsValue : null,
-              fine_print: reward.fine_print, // Assuming fine_print is available in the reward
-              fine_print_source: reward.fine_print_source, // Assuming fine_print is available in the reward
-            };
-          } 
+              card_name: card.card,
+              cash_back_pct: cashBackValue >= pointsValue ? cashBackValue : undefined,
+              points_per_dollar: pointsValue >= cashBackValue ? pointsValue : undefined,
+              fine_print: reward.fine_print || '',
+              fine_print_source: reward.fine_print_source || '',
+            });
+          } else if (higherValue === highestValue) {
+            bestCardsList.push({
+              company: card.company,
+              card_name: card.card,
+              cash_back_pct: cashBackValue >= pointsValue ? cashBackValue : undefined,
+              points_per_dollar: pointsValue >= cashBackValue ? pointsValue : undefined,
+              fine_print: reward.fine_print || '',
+              fine_print_source: reward.fine_print_source || '',
+            });
+          }
         } else {
           console.log("No reward found for category:", category, "in card:", card.card);
         }
       });
-      return { category, bestCard };
+      return { category, bestCards: bestCardsList };
     });
 
     res.json(bestCards);

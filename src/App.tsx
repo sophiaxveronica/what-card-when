@@ -311,25 +311,32 @@ export default function Component() {
             <h2 className="text-3xl font-bold mb-6 gradient-text text-darkGreen">Your Optimal Card Usage:</h2>
             <div className="space-y-4">
               {results.map((category, index) => {
+                console.log(category);
+                console.log();
               return (
-                <div key={index} className="bg-white p-4 rounded-xl shadow-md border-2 border-darkGreen">
-                  <h3 className="text-xl font-semibold text-darkGreen mb-2">{capitalizeWords(category.category)}</h3>
-                  {category.bestCard ? (
-                    <>
-                      <p className="text-darkGreen">Best Card: <span className="font-medium text-green-500">{`${category.bestCard.company} - ${category.bestCard.card_name}`}</span></p>
-                      <p className="text-darkGreen">
-                        {category.bestCard.cash_back_pct 
-                          ? 'Cash back: ' 
-                          : 'Points per dollar: '}
-                        <span className="font-medium text-green-500">
-                          {category.bestCard.cash_back_pct 
-                            ? `${category.bestCard.cash_back_pct}%` 
-                            : category.bestCard.points_per_dollar}
-                        </span>
-                      </p>
-                      <p className="text-darkGreen">Fine Print: <span className="font-small text-green-500">{category.bestCard.fine_print}</span></p>
-                    </>
-                  ) : (
+                  <div key={index} className="bg-white p-4 rounded-xl shadow-md border-2 border-darkGreen">
+                    <h3 className="text-xl font-semibold text-darkGreen mb-2">{capitalizeWords(category.category)}</h3>
+                    {category.bestCards && category.bestCards.length > 0 ? ( // Check if bestCards exist and have items
+                      <>
+                        {category.bestCards.map((bestCard, cardIndex) => (
+                          <div key={cardIndex}>
+                            <p className="text-darkGreen">Best Card: <span className="font-medium text-green-500">{`${bestCard.company} - ${bestCard.card_name}`}</span></p>
+                            <p className="text-darkGreen">
+                              {bestCard.cash_back_pct 
+                                ? 'Cash back: ' 
+                                : 'Points per dollar: '}
+                              <span className="font-medium text-green-500">
+                                {bestCard.cash_back_pct 
+                                  ? `${bestCard.cash_back_pct}%` 
+                                  : bestCard.points_per_dollar}
+                              </span>
+                            </p>
+                            <p className="text-darkGreen">Fine Print: <span className="font-small text-green-500">{bestCard.fine_print}</span></p>
+                            {category.bestCards && cardIndex < category.bestCards.length - 1 && <br />} {/* Add line break except for the last card */}
+                          </div>
+                        ))}
+                      </>
+                    ) : (
                     <>
                     <p className="text-red-500">No card available for this category</p>
                     </>
