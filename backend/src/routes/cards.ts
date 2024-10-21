@@ -60,21 +60,17 @@ router.route('/filter').post(async (req, res) => {
   try {
     // Load the credit card data for the inputted cards
     const selected_credit_cards = await CreditCardData.find({ card: { $in: card_names } });
-    console.log("Fetched cards:", selected_credit_cards);
 
     // Iteratively determine the best card for each category
     const bestCards = selected_categories.map(category => {
-      console.log("Category", category);
       let bestCard = null;
       let highestValue = 0; // This will hold the highest value (cashback or points)
 
       selected_credit_cards.forEach(card => {
-        console.log("CARD", card.card);
 
         // Check if this card has any specific rewards for the category
         const reward = card.rewards.find(r => r.category == category);
         if (reward) {
-          console.log("CARD", card.rewards);
           const cashBackValue = reward.cash_back_pct || 0; // Assuming cash_back_pct is the cashback percentage
           const pointsValue = reward.points_per_dollar || 0; // Assuming points_per_dollar is the points value
 
@@ -85,16 +81,17 @@ router.route('/filter').post(async (req, res) => {
             highestValue = higherValue;
             bestCard = {
               company: card.company,
-              type: card.card, // Assuming 'card' is the field for the card name
-              value: higherValue, // This will hold the higher value (cashback or points)
-              finePrint: reward.fine_print, // Assuming fine_print is available in the reward
+              card_name: card.card, // Assuming 'card' is the field for the card name
+              cash_back_pct: cashBackValue >= pointsValue ? cashBackValue : null,
+              points_per_dollar: pointsValue >= cashBackValue ? pointsValue : null,
+              fine_print: reward.fine_print, // Assuming fine_print is available in the reward
+              fine_print_source: reward.fine_print_source, // Assuming fine_print is available in the reward
             };
           } 
         } else {
           console.log("No reward found for category:", category, "in card:", card.card);
         }
       });
-
       return { category, bestCard };
     });
 

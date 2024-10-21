@@ -303,20 +303,23 @@ export default function Component() {
           <div className="bg-white p-8 rounded-t-3xl -mt-2 ">
             <h2 className="text-3xl font-bold mb-6 gradient-text text-darkGreen">Your Optimal Card Usage:</h2>
             <div className="space-y-4">
-              {results.map((category, index) => (
+              {results.map((category, index) => {
+              return (
                 <div key={index} className="bg-white p-4 rounded-xl shadow-md border-2 border-darkGreen">
                   <h3 className="text-xl font-semibold text-lightGreen mb-2">{capitalizeWords(category.category)}</h3>
-                  {category.best_card ? (
+                  {category.bestCard ? (
                     <>
-                      <p className="text-darkGreen">Best Card: <span className="font-medium">{`${category.best_card.company} - ${category.best_card.card_name}`}</span></p>
-                      <p className="text-darkGreen">Cashback: <span className="font-medium">{category.best_card.cash_back_pct}%</span></p>
-                      <p className="text-darkGreen">Fine Print: <span className="font-small">{category.best_card.fine_print}</span></p>
+                      <p className="text-darkGreen">Best Card: <span className="font-medium">{`${category.bestCard.company} - ${category.bestCard.card_name}`}</span></p>
+                      <p className="text-darkGreen">Cashback: <span className="font-medium">{category.bestCard.cash_back_pct}%</span></p>
+                      <p className="text-darkGreen">Fine Print: <span className="font-small">{category.bestCard.fine_print}</span></p>
                     </>
                   ) : (
+                    <>
                     <p className="text-red-500">No card available for this category</p>
+                    </>
                   )}
                 </div>
-              ))}
+              )})}
             </div>
           </div>
         )}
