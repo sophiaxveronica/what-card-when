@@ -282,7 +282,7 @@ export default function Component() {
               onClick={handleGenerateAndEmailResults}
               className={`w-full py-4 rounded-full text-xl font-bold shadow-lg transform transition duration-200 
             ${isFormValid(selectedCategories, cards, isValidEmail, name)
-                  ? 'bg-lightGreen hover:bg-darkGreen text-white hover:scale-105'
+                  ? 'bg-darkGreen text-white hover:bg-lightGreen hover:text-darkGreen hover:scale-105'
                   : 'bg-gray-400 text-gray-600 cursor-not-allowed'}`}
             >
               Get your results!
@@ -313,12 +313,21 @@ export default function Component() {
               {results.map((category, index) => {
               return (
                 <div key={index} className="bg-white p-4 rounded-xl shadow-md border-2 border-darkGreen">
-                  <h3 className="text-xl font-semibold text-lightGreen mb-2">{capitalizeWords(category.category)}</h3>
+                  <h3 className="text-xl font-semibold text-darkGreen mb-2">{capitalizeWords(category.category)}</h3>
                   {category.bestCard ? (
                     <>
-                      <p className="text-darkGreen">Best Card: <span className="font-medium">{`${category.bestCard.company} - ${category.bestCard.card_name}`}</span></p>
-                      <p className="text-darkGreen">Cashback: <span className="font-medium">{category.bestCard.cash_back_pct}%</span></p>
-                      <p className="text-darkGreen">Fine Print: <span className="font-small">{category.bestCard.fine_print}</span></p>
+                      <p className="text-darkGreen">Best Card: <span className="font-medium text-green-500">{`${category.bestCard.company} - ${category.bestCard.card_name}`}</span></p>
+                      <p className="text-darkGreen">
+                        {category.bestCard.cash_back_pct 
+                          ? 'Cash back: ' 
+                          : 'Points per dollar: '}
+                        <span className="font-medium text-green-500">
+                          {category.bestCard.cash_back_pct 
+                            ? `${category.bestCard.cash_back_pct}%` 
+                            : category.bestCard.points_per_dollar}
+                        </span>
+                      </p>
+                      <p className="text-darkGreen">Fine Print: <span className="font-small text-green-500">{category.bestCard.fine_print}</span></p>
                     </>
                   ) : (
                     <>
