@@ -13,8 +13,12 @@ export const fetchCardCompanies = async () => {
 export const fetchCardCategories = async () => {
   try {
     const response = await fetch(`${API_BASE_URL}/cards/categories`);
-    return await response.json();
-  } catch (error) {
+    const categories = await response.json();
+    
+    // Exclude the category "other_spending"
+    const filteredCategories = categories.filter((category: string) => category !== 'other_spending');
+    return filteredCategories;
+    } catch (error) {
     console.error('Error fetching card companies:', error);
     throw error;
   }
