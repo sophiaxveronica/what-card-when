@@ -10,6 +10,20 @@ export const fetchCardCompanies = async () => {
   }
 };
 
+export const fetchCardCategories = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/cards/categories`);
+    const categories = await response.json();
+    
+    // Exclude the category "other_spending"
+    const filteredCategories = categories.filter((category: string) => category !== 'other_spending');
+    return filteredCategories;
+    } catch (error) {
+    console.error('Error fetching card companies:', error);
+    throw error;
+  }
+};
+
 export const fetchCardOptions = async (company: string) => {
   try {
     const response = await fetch(`${API_BASE_URL}/cards/options/${company}`);
@@ -20,14 +34,14 @@ export const fetchCardOptions = async (company: string) => {
   }
 };
 
-export const calculateRecommendations = async (cards: any[], selectedCategories: string[]) => {
+export const calculateRecommendations = async (card_names: string[], selected_categories: string[]) => {
   try {
     const response = await fetch(`${API_BASE_URL}/cards/filter`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ cards, categories: selectedCategories }),
+      body: JSON.stringify({ card_names, selected_categories }),
     });
     return await response.json();
   } catch (error) {

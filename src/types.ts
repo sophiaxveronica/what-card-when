@@ -1,14 +1,13 @@
-export type SpendingCategory = {
+export type CategoryWithBestCreditCard = {
     category: string;
-    bestCard: {
-      company: string;
-      type: string;
-      percentage: number;
-      finePrint: string;
-    } | null;
+    bestCards: BestCard[] | null;
   };
 
-  export type Card = {
-    company: string;
-    type: string;
-  };
+  // Define the BestCard type
+type BestCard = {
+  company: string;
+  card_name: string;
+  cash_back_pct?: number; // Optional property
+  points_per_dollar?: number; // Optional property
+  fine_print: string;
+};

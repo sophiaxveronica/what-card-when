@@ -5,32 +5,23 @@ import React from 'react';
 import './index.css';
 import { capitalizeWords } from './utils/stringUtils';
 import { validateEmail, isFormValid, createFormErrorMessage } from './utils/validationUtils';
+import { fetchCardCompanies, fetchCardCategories, fetchCardOptions, calculateRecommendations, sendEmail } from './utils/apiUtils';
 import { generateEmail } from './utils/emailUtils';
-import { fetchCardCompanies, fetchCardOptions, calculateRecommendations, sendEmail } from './utils/apiUtils';
-import { SpendingCategory, Card } from './types';
+
+import { CategoryWithBestCreditCard } from './types';
 
 const timeoutPromise = (ms: number) => new Promise((_, reject) => setTimeout(() => reject(new Error('Request timed out')), ms));
 
 const SELECTED_CARD_LIMIT = 6;
 
-const categories = [
-  'dining',
-  'lyft',
-  'uber',
-  'public transport',
-  'groceries',
-  'gas',
-  'hotels',
-  'flights'
-];
-
 export default function Component() {
-  const [cards, setCards] = useState<{ company: string; type: string }[]>([]);
+  const [cards, setCards] = useState<{ company: string; card_name: string }[]>([]);
   const [selectedCompany, setSelectedCompany] = useState('');
   const [showResults, setShowResults] = useState(false);
-  const [results, setResults] = useState<SpendingCategory[]>([]);
+  const [results, setResults] = useState<CategoryWithBestCreditCard[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [cardCompanies, setCardCompanies] = useState<string[]>([]);
+  const [cardCategories, setCardCategories] = useState<string[]>([]);
   const [cardOptions, setCardOptions] = useState<string[]>([]);
   const [email, setEmail] = useState('');
   const [isValidEmail, setIsValidEmail] = useState(false);
@@ -40,7 +31,14 @@ export default function Component() {
   const [successMessage, setSuccessMessage] = useState('');
 
   useEffect(() => {
-    fetchCardCompanies().then(setCardCompanies);
+    const fetchData = async () => {
+      const companies = await fetchCardCompanies();
+      setCardCompanies(companies);
+      const categories = await fetchCardCategories();
+      setCardCategories(categories);
+      setSelectedCategories(categories); // Set selectedCategories to all fetched categories
+    };
+    fetchData();
   }, []);
 
   // Form validation for email field
@@ -58,9 +56,9 @@ export default function Component() {
   };
 
   // Helper for selecting card
-  const addCard = (type: string) => {
-    if (!cards.some(card => card.company === selectedCompany && card.type === type)) {
-      setCards([...cards, { company: selectedCompany, type }]);
+  const addCard = (card_name: string) => {
+    if (!cards.some(card => card.company === selectedCompany && card.card_name === card_name)) {
+      setCards([...cards, { company: selectedCompany, card_name }]);
     }
     setFormError('');
   };
@@ -85,19 +83,20 @@ export default function Component() {
         const timeoutDuration = 3000; // 3 second timeout, TODO: is this too short?
 
         // First we calculate the recommendations and display them
+        const card_names :string[] = cards.map(card => card.card_name)
         const data = await Promise.race([
-          calculateRecommendations(cards, selectedCategories),
+          calculateRecommendations(card_names, selectedCategories),
           timeoutPromise(timeoutDuration)
         ]);
         setResults(data);
         setShowResults(true);
 
         // Then we create and send the email 
-        // const htmlString = generateEmail(data, name, cards);
-        // await Promise.race([
-        //   sendEmail(email, name, htmlString),
-        //   timeoutPromise(timeoutDuration)
-        // ]);
+        const htmlString = generateEmail(data, name, card_names);
+        await Promise.race([
+        sendEmail(email, name, htmlString),
+        timeoutPromise(timeoutDuration)
+        ]);
 
         setSuccessMessage("Great! We've sent your results. Check your email!");
       } catch (error) {
@@ -123,12 +122,13 @@ export default function Component() {
                 Select categories
               </Label>
               <div className="grid grid-cols-2 gap-4 mt-2 border border-darkGreen rounded-lg p-4 bg-gray-50">
-                {categories.map((category) => (
+                {cardCategories.map((category) => (
                   <div key={category} className="flex items-center">
                     <input
                       type="checkbox"
                       id={category}
                       value={category}
+                      checked={selectedCategories.includes(category)} // Check if the category is selected
                       onChange={(e) => {
                         if (e.target.checked) {
                           setSelectedCategories([...selectedCategories, category]);
@@ -177,7 +177,6 @@ export default function Component() {
                 </select>
               </div>
             </div>
-
             {/* CARD SELECTION FOR A SPECIFIC COMPANY */}
             {selectedCompany && (
               <div>
@@ -185,7 +184,7 @@ export default function Component() {
                 <div className="flex flex-wrap gap-3">
                   {Array.isArray(cardOptions) ? (
                     cardOptions.map((card: string, index: number) => {
-                      const isCardSelected = cards.some(c => c.company === selectedCompany && c.type === card);
+                      const isCardSelected = cards.some(c => c.company === selectedCompany && c.card_name === card);
                       const isMaxCardsSelected = cards.length >= SELECTED_CARD_LIMIT;
                       return (
                         <button
@@ -226,9 +225,9 @@ export default function Component() {
                 {cards.map((card, index) => (
                   <div key={index} className="bg-lightGreen rounded-xl shadow-sm" style={{ width: '180px', aspectRatio: '1.586' }}>
                     <div className="h-full p-4 flex flex-col justify-between">
-                      <div className="flex-grow flex flex-col items-center justify-center text-center">
+                      <div className="flex-grow flex flex-col items-center justify-center text-center relative">
                         <p className="text-lg text-darkGreen font-medium">{card.company}</p>
-                        <p className="text-md text-darkGreen">{card.type}</p>
+                        <p className="text-md text-darkGreen truncate" title={card.card_name}>{card.card_name}</p>
                       </div>
                       <button
                         onClick={() => removeCard(index)}
@@ -285,7 +284,7 @@ export default function Component() {
               onClick={handleGenerateAndEmailResults}
               className={`w-full py-4 rounded-full text-xl font-bold shadow-lg transform transition duration-200 
             ${isFormValid(selectedCategories, cards, isValidEmail, name)
-                  ? 'bg-lightGreen hover:bg-darkGreen text-white hover:scale-105'
+                  ? 'bg-darkGreen text-white hover:bg-lightGreen hover:text-darkGreen hover:scale-105'
                   : 'bg-gray-400 text-gray-600 cursor-not-allowed'}`}
             >
               Get your results!
@@ -313,20 +312,37 @@ export default function Component() {
           <div className="bg-white p-8 rounded-t-3xl -mt-2 ">
             <h2 className="text-3xl font-bold mb-6 gradient-text text-darkGreen">Your Optimal Card Usage:</h2>
             <div className="space-y-4">
-              {results.map((category, index) => (
-                <div key={index} className="bg-white p-4 rounded-xl shadow-md border-2 border-darkGreen">
-                  <h3 className="text-xl font-semibold text-lightGreen mb-2">{capitalizeWords(category.category)}</h3>
-                  {category.bestCard ? (
+              {results.map((category, index) => {
+              return (
+                  <div key={index} className="bg-white p-4 rounded-xl shadow-md border-2 border-darkGreen">
+                    <h3 className="text-xl font-semibold text-darkGreen mb-2">{capitalizeWords(category.category)}</h3>
+                    {category.bestCards && category.bestCards.length > 0 ? ( // Check if bestCards exist and have items
+                      <>
+                        {category.bestCards.map((bestCard, cardIndex) => (
+                          <div key={cardIndex}>
+                            <p className="text-darkGreen">Best Card: <span className="font-medium text-green-500">{`${bestCard.company} - ${bestCard.card_name}`}</span></p>
+                            <p className="text-darkGreen">
+                              {bestCard.cash_back_pct 
+                                ? 'Cash back: ' 
+                                : 'Points per dollar: '}
+                              <span className="font-medium text-green-500">
+                                {bestCard.cash_back_pct 
+                                  ? `${bestCard.cash_back_pct}%` 
+                                  : bestCard.points_per_dollar}
+                              </span>
+                            </p>
+                            <p className="text-darkGreen">Fine Print: <span className="font-small text-green-500">{bestCard.fine_print}</span></p>
+                            {category.bestCards && cardIndex < category.bestCards.length - 1 && <br />} {/* Add line break except for the last card */}
+                          </div>
+                        ))}
+                      </>
+                    ) : (
                     <>
-                      <p className="text-darkGreen">Best Card: <span className="font-medium">{`${category.bestCard.company} - ${category.bestCard.type}`}</span></p>
-                      <p className="text-darkGreen">Cashback: <span className="font-medium">{category.bestCard.percentage}%</span></p>
-                      <p className="text-darkGreen">Fine Print: <span className="font-small">{category.bestCard.finePrint}</span></p>
-                    </>
-                  ) : (
                     <p className="text-red-500">No card available for this category</p>
+                    </>
                   )}
                 </div>
-              ))}
+              )})}
             </div>
           </div>
         )}
