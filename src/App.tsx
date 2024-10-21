@@ -223,9 +223,9 @@ export default function Component() {
                 {cards.map((card, index) => (
                   <div key={index} className="bg-lightGreen rounded-xl shadow-sm" style={{ width: '180px', aspectRatio: '1.586' }}>
                     <div className="h-full p-4 flex flex-col justify-between">
-                      <div className="flex-grow flex flex-col items-center justify-center text-center">
+                      <div className="flex-grow flex flex-col items-center justify-center text-center relative">
                         <p className="text-lg text-darkGreen font-medium">{card.company}</p>
-                        <p className="text-md text-darkGreen">{card.card_name}</p>
+                        <p className="text-md text-darkGreen truncate" title={card.card_name}>{card.card_name}</p>
                       </div>
                       <button
                         onClick={() => removeCard(index)}
