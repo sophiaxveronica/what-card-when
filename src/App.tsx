@@ -29,8 +29,14 @@ export default function Component() {
   const [successMessage, setSuccessMessage] = useState('');
 
   useEffect(() => {
-    fetchCardCompanies().then(setCardCompanies);
-    fetchCardCategories().then(setCardCategories);
+    const fetchData = async () => {
+      const companies = await fetchCardCompanies();
+      setCardCompanies(companies);
+      const categories = await fetchCardCategories();
+      setCardCategories(categories);
+      setSelectedCategories(categories); // Set selectedCategories to all fetched categories
+    };
+    fetchData();
   }, []);
 
   // Form validation for email field
@@ -120,6 +126,7 @@ export default function Component() {
                       type="checkbox"
                       id={category}
                       value={category}
+                      checked={selectedCategories.includes(category)} // Check if the category is selected
                       onChange={(e) => {
                         if (e.target.checked) {
                           setSelectedCategories([...selectedCategories, category]);
