@@ -6,4 +6,7 @@ export default defineConfig({
     port: 3000, // Change to the port you prefer
   },
   plugins: [react()],
+  define: {
+    'process.env.VITE_API_BASE_URL': JSON.stringify(process.env.VITE_API_BASE_URL),
+  },
 });
