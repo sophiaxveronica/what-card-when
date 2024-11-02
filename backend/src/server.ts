@@ -32,12 +32,6 @@ connection.once('open', async () => {
   const databases = await mongoose.connection.listDatabases()
   console.log(JSON.stringify(databases));
 
-  console.log("Printing all Card data:")
-  const allData = await CreditCardData.find({});
-  console.log(JSON.stringify(allData));
-
-
-
 });
 
 app.listen(port, () => {
