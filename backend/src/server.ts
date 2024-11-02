@@ -29,7 +29,7 @@ connection.once('open', async () => {
   const collections = await mongoose.connection.listCollections()
   console.log(JSON.stringify(collections));
   console.log("Printing databases:")
-  const databases = await mongoose.connection.listCollections()
+  const databases = await mongoose.connection.listDatabases()
   console.log(JSON.stringify(databases));
 
   console.log("Printing all Card data:")
