@@ -4,6 +4,7 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cardsRouter from './routes/cards';
 import emailsRouter from './routes/emails';
+import { CreditCardData } from './models/card.model';
 
 dotenv.config();
 
@@ -30,6 +31,11 @@ connection.once('open', async () => {
   console.log("Printing databases:")
   const databases = await mongoose.connection.listCollections()
   console.log(JSON.stringify(databases));
+
+  console.log("Printing all Card data:")
+  const allData = await CreditCardData.find({});
+  console.log(JSON.stringify(allData));
+
 
 
 });
