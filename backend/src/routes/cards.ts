@@ -9,6 +9,17 @@ type CreditCardApiType = {
   finePrint: string;
 }
 
+router.route('/alldata').get(async (req, res) => {
+  try {
+    const allData = await CreditCardData.find({});
+    res.json(allData);
+  } catch (err) {
+    console.error('Error fetching allData:', err);
+    res.status(400).json('Error: ' + err);
+  }
+});
+
+
 router.route('/companies').get(async (req, res) => {
   try {
     const detailedCards: string[] = await CreditCardData.distinct('company');
