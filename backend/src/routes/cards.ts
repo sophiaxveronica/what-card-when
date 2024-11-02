@@ -11,7 +11,7 @@ type CreditCardApiType = {
 
 router.route('/companies').get(async (req, res) => {
   try {
-    const detailedCards :string[] = await CreditCardData.distinct('company');
+    const detailedCards: string[] = await CreditCardData.distinct('company');
     res.json(detailedCards);
   } catch (err) {
     console.error('Error fetching distinct companies:', err);
@@ -21,8 +21,8 @@ router.route('/companies').get(async (req, res) => {
 
 router.route('/categories').get(async (req, res) => {
   try {
-    const categories :string[] = await CreditCardData.distinct('rewards.category');
-    res.json(categories);
+    const categories: string[] = await CreditCardData.distinct('rewards.category');
+    res.json(["matt", "veronica", "sophia"]);
   } catch (err) {
     console.error('Error fetching distinct categories:', err);
     res.status(400).json('Error: ' + err);
