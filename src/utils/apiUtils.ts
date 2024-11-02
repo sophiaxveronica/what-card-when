@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:5001/api';
+const API_BASE_URL = process.env.VITE_API_BASE_URL || 'http://localhost:5001/api';
 
 export const fetchCardCompanies = async () => {
   try {
@@ -14,11 +14,11 @@ export const fetchCardCategories = async () => {
   try {
     const response = await fetch(`${API_BASE_URL}/cards/categories`);
     const categories = await response.json();
-    
+
     // Exclude the category "other_spending"
     const filteredCategories = categories.filter((category: string) => category !== 'other_spending');
     return filteredCategories;
-    } catch (error) {
+  } catch (error) {
     console.error('Error fetching card companies:', error);
     throw error;
   }
