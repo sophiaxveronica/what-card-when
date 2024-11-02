@@ -8,12 +8,13 @@ import emailsRouter from './routes/emails';
 dotenv.config();
 
 const app = express();
-const port = 5001;
+const port = process.env.PORT || 5001;
 
 app.use(cors());
 app.use(express.json());
 app.use('/api/cards', cardsRouter);
 app.use('/api/emails', emailsRouter);
+app.use(express.static('../dist'))
 
 mongoose.connect(process.env.MONGODB_URI as string);
 const connection = mongoose.connection;
