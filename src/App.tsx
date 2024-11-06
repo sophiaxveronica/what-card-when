@@ -121,7 +121,7 @@ export default function Component() {
               <Label htmlFor="category-select" className="text-xl font-semibold font-medium text-darkGreen">
                 Select categories
               </Label>
-              <div className="grid grid-cols-2 gap-4 mt-2 border border-darkGreen rounded-lg p-4 bg-gray-50">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2 border border-darkGreen rounded-lg p-4 bg-gray-50">
                 {cardCategories.map((category) => (
                   <div key={category} className="flex items-center">
                     <input
@@ -139,7 +139,7 @@ export default function Component() {
                       }}
                       className="form-checkbox h-5 w-5 text-lightGreen border-gray-300 rounded focus:ring-lightPink"
                     />
-                    <label htmlFor={category} className="ml-2 text-lg text-darkGreen hover:text-lightGreen transition duration-200 label">
+                    <label htmlFor={category} className="ml-2 text-lg text-darkGreen hover:text-lightGreen transition duration-200">
                       {capitalizeWords(category)}
                     </label>
                   </div>

@@ -2,12 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-.label {
-  overflow-wrap: break-word; /* Allows breaking long words */
-  word-wrap: break-word; /* Fallback for older browsers */
-  white-space: normal; /* Allows text to wrap */
-}
-
 .relative {
   position: relative;
 }
