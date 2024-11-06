@@ -5,3 +5,10 @@ export const capitalizeWords = (str: string) => {
       .map((word, index) => index === 0 ? word.charAt(0).toUpperCase() + word.slice(1) : word) // Capitalize only the first word
       .join(' ');
   };
+
+  export const lowercaseWords = (str: string) => {
+    return str
+      .replace(/_/g, ' ') // Replace underscores with spaces
+      .split(' ')
+      .join(' ');
+  };

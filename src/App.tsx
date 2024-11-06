@@ -3,7 +3,7 @@ import { Trash2 } from 'lucide-react';
 import { Label } from '@radix-ui/react-label';
 import React from 'react';
 import './index.css';
-import { capitalizeWords } from './utils/stringUtils';
+import { capitalizeWords, lowercaseWords } from './utils/stringUtils';
 import { validateEmail, isFormValid, createFormErrorMessage } from './utils/validationUtils';
 import { fetchCardCompanies, fetchCardCategories, fetchCardOptions, calculateRecommendations, sendEmail } from './utils/apiUtils';
 import { generateEmail } from './utils/emailUtils';
@@ -350,12 +350,41 @@ export default function Component() {
                 return null;
               })}
 
-                    {/* Display categories without best cards at the bottom */}
-                    {categoriesWithoutBestCard.length > 0 && (
-                      <div className="mt-4">
-                        <p className="text-red-500">We couldn't find a best card for the following categories: {categoriesWithoutBestCard.join(', ')}</p>
-                      </div>
-                    )}
+              
+      {/* Display categories without best cards at the bottom */}
+                    
+      {categoriesWithoutBestCard.length > 0 && (
+          <div className="mt-4">
+            {/* Check for best cards in the "other_spending" category */}
+            {(() => {
+              const otherSpendingCategory = results.find(category => category.category === "other_spending");
+              const bestCards = otherSpendingCategory?.bestCards;
+
+              if (bestCards?.length === 1) {
+                return (
+                  <p className="text-darkGreen">
+                    For the remaining categories ({categoriesWithoutBestCard.map(lowercaseWords).join(', ')}) and other spending, your best card is <span className="font-medium text-green-500">{`${bestCards[0].card_name}`}</span>, which offers <span className="font-medium text-green-500">{bestCards[0].cash_back_pct ? `${bestCards[0].cash_back_pct}% cash back` : `${bestCards[0].points_per_dollar} points per dollar`}</span>.
+                  </p>
+                );
+              } else if (bestCards?.length && bestCards?.length > 1) {
+                return (
+                  <p className="text-darkGreen">
+                    For the remaining categories ({categoriesWithoutBestCard.map(lowercaseWords).join(', ')}) and other spending, your best cards are: {bestCards.map((bestCard, index) => (
+                      <span key={index} className="font-medium text-green-500">{`${bestCard.card_name}`}{index < bestCards.length - 1 ? ', ' : ''}</span>
+                    ))}.
+                  </p>
+                );
+              } else {
+                return (
+                  <p className="text-black-500">
+                    No rewards card found for {categoriesWithoutBestCard.map(lowercaseWords).join(', ')} and other spending.
+                  </p>
+                );
+              }
+            })()}
+          </div>
+        )}
+
                   </>
                 );
               })()}
