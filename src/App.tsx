@@ -346,7 +346,9 @@ export default function Component() {
                   );
                 }
                 // If no best cards, return null to skip rendering
-                categoriesWithoutBestCard.push(category.category) // Track categories without best cards
+                if (category.category!="other_spending") {
+                categoriesWithoutBestCard.push(category.category)
+                } // Track categories without best cards
                 return null;
               })}
 
