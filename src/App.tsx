@@ -121,7 +121,7 @@ export default function Component() {
               <Label htmlFor="category-select" className="text-xl font-semibold font-medium text-darkGreen">
                 Select categories
               </Label>
-              <div className="grid grid-cols-2 gap-4 mt-2 border border-darkGreen rounded-lg p-4 bg-gray-50">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2 border border-darkGreen rounded-lg p-4 bg-gray-50">
                 {cardCategories.map((category) => (
                   <div key={category} className="flex items-center">
                     <input
@@ -226,7 +226,7 @@ export default function Component() {
                   <div key={index} className="bg-lightGreen rounded-xl shadow-sm" style={{ width: '180px', aspectRatio: '1.586' }}>
                     <div className="h-full p-4 flex flex-col justify-between">
                       <div className="flex-grow flex flex-col items-center justify-center text-center relative">
-                        <p className="text-lg text-darkGreen font-medium">{card.company}</p>
+                        <p className="text-lg text-darkGreen font-medium truncate">{card.company}</p>
                         <p className="text-md text-darkGreen truncate" title={card.card_name}>{card.card_name}</p>
                       </div>
                       <button
