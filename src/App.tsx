@@ -363,7 +363,7 @@ export default function Component() {
               if (bestCards?.length === 1) {
                 return (
                   <p className="text-darkGreen">
-                    For the remaining categories ({categoriesWithoutBestCard.map(lowercaseWords).join(', ')}) and other spending, your best card is <span className="font-medium text-green-500">{`${bestCards[0].card_name}`}</span>, which offers <span className="font-medium text-green-500">{bestCards[0].cash_back_pct ? `${bestCards[0].cash_back_pct}% cash back` : `${bestCards[0].points_per_dollar} points per dollar`}</span>.
+                    For the remaining categories ({categoriesWithoutBestCard.map(lowercaseWords).join(', ')}) and other spending, your best card is <span className="font-medium text-green-500">{`${bestCards[0].card_name}`}</span>, which offers <span className="font-medium text-green-500">{bestCards[0].cash_back_pct ? `${bestCards[0].cash_back_pct}% cash back` : `${bestCards[0].points_per_dollar} points per $`}</span>.
                   </p>
                 );
               } else if (bestCards?.length && bestCards?.length > 1) {
