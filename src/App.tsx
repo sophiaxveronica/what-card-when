@@ -139,7 +139,7 @@ export default function Component() {
                       }}
                       className="form-checkbox h-5 w-5 text-lightGreen border-gray-300 rounded focus:ring-lightPink"
                     />
-                    <label htmlFor={category} className="ml-2 text-lg text-darkGreen hover:text-lightGreen transition duration-200 overflow-wrap break-words">
+                    <label htmlFor={category} className="ml-2 text-lg text-darkGreen hover:text-lightGreen transition duration-200 label">
                       {capitalizeWords(category)}
                     </label>
                   </div>
