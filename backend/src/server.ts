@@ -4,7 +4,6 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cardsRouter from './routes/cards';
 import emailsRouter from './routes/emails';
-import { CreditCardData } from './models/card.model';
 
 dotenv.config();
 
@@ -19,7 +18,6 @@ app.use(express.static('../dist'))
 
 console.log(process.env.MONGODB_URI);
 mongoose.connect(process.env.MONGODB_URI as string);
-mongoose.set('debug', true);
 
 const connection = mongoose.connection;
 connection.once('open', async () => {
