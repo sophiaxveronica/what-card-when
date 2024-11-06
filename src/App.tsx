@@ -320,18 +320,18 @@ export default function Component() {
                       <>
                         {category.bestCards.map((bestCard, cardIndex) => (
                           <div key={cardIndex}>
-                            <p className="text-darkGreen">Best Card: <span className="font-medium text-green-500">{`${bestCard.company} - ${bestCard.card_name}`}</span></p>
+                            <p className="text-darkGreen">Best card: <span className="font-medium text-green-500">{`${bestCard.company} - ${bestCard.card_name}`}</span></p>
                             <p className="text-darkGreen">
                               {bestCard.cash_back_pct 
                                 ? 'Cash back: ' 
-                                : 'Points per dollar: '}
+                                : 'Points per $: '}
                               <span className="font-medium text-green-500">
                                 {bestCard.cash_back_pct 
                                   ? `${bestCard.cash_back_pct}%` 
                                   : bestCard.points_per_dollar}
                               </span>
                             </p>
-                            <p className="text-darkGreen">Fine Print: <span className="font-small text-green-500">{bestCard.fine_print}</span></p>
+                            <p className="text-darkGreen">Fine print: <span className="font-small text-green-500">{bestCard.fine_print}</span></p>
                             {category.bestCards && cardIndex < category.bestCards.length - 1 && <br />} {/* Add line break except for the last card */}
                           </div>
                         ))}
