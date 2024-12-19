@@ -9,12 +9,15 @@ We build a product using RAG-augmented LLMs to pull and analyze credit card rewa
 
 ## Web UI
 Check out the full web flow to select cards and generate recommendations.
+
 https://github.com/user-attachments/assets/6e4a9f98-f9bf-431b-a85d-80130037b62f
 
 ## Selecting cards
 We designed a novel UI to select all the credit cards you hold.
+
 https://github.com/user-attachments/assets/4f2a33ad-b28e-4b5b-8ccd-df3526a09ff1
 
 ## Recommendation email
 After we generate the results live, we also email you them.
+
 https://github.com/user-attachments/assets/2c19b262-de2d-4bb0-83fb-602106fbe71b
