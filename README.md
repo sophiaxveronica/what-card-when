@@ -1,8 +1,8 @@
 # WHATCARDWHEN?
 
-<img width="461" alt="Screenshot 2024-10-29 at 1 35 22 PM" src="https://github.com/user-attachments/assets/e87d1d0a-e180-4616-a7f4-7e51f1f5507a" />
+<img width="25%" alt="Screenshot 2024-10-29 at 1 35 22 PM" src="https://github.com/user-attachments/assets/e87d1d0a-e180-4616-a7f4-7e51f1f5507a" />
 
-<img width="1270" alt="Screenshot 2024-12-19 at 4 20 16 PM" src="https://github.com/user-attachments/assets/89543bb0-9aca-403e-870c-1b45bb046c69" />
+<img width="100%" alt="Screenshot 2024-12-19 at 4 20 16 PM" src="https://github.com/user-attachments/assets/89543bb0-9aca-403e-870c-1b45bb046c69" />
 
 ## About
 We build a product using RAG-augmented LLMs to pull and analyze credit card rewards data from official sources and make it easy for users to optimize their credit card spending given the credit cards they own, with a simple UI, previously available at whatcardwhen.com.
